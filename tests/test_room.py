@@ -37,6 +37,7 @@ async def test_ot_room(client, api):
     }
     assert data["check_in"] == "14:00-23:00" and data["check_out"] == "12:00"
     assert (data["rating"], data["rating_count"], data["successful_bookings"]) == (5.0, 3, 47)
+    assert data["instant_on_some_nights"] is True and "instant" not in data
     assert "reviews" not in data  # seo commentCount can double the written reviews
     assert "ورود حیوان خانگی مجاز نیست" in data["rules"]
     assert data["rules"][-1].startswith("با توجه به چوبی بودن سازه")  # host's own rule

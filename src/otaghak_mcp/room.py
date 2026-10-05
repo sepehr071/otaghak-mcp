@@ -39,7 +39,9 @@ async def ot_room(
 
     With check_in/check_out the price is the average night for those dates, even when they are
     booked (ot_price_quote or ot_room_calendar tells whether they are free); without, an undated
-    starting price. Use after ot_search_rooms or ot_find_place. Next: ot_price_quote (exact total),
+    starting price. instant_on_some_nights is the room-level flag: instant booking can differ per night,
+    so for given dates read `instant` in ot_price_quote or ot_room_calendar.
+    Use after ot_search_rooms or ot_find_place. Next: ot_price_quote (exact total),
     ot_room_calendar (free nights), ot_reviews, ot_host (host response and acceptance rates),
     ot_similar_rooms.
     """
@@ -100,7 +102,7 @@ async def ot_room(
         # seo `commentCount` can be twice the written reviews (16 vs 8 for 2510831): use the rating count only.
         "rating_count": seo.get("rateCount"),
         "successful_bookings": seo.get("successfulBookingCount"),
-        "instant": seo.get("isInstant"),
+        "instant_on_some_nights": seo.get("isInstant"),  # room flag; per night it can be off (2388753)
         "prime": seo.get("isPrime"),
         "last_second_discount": seo.get("isLastSecondDiscount"),
         "price": {
