@@ -1,0 +1,16 @@
+{
+ "roomId": 2512254,
+ "roomName": "سوئیسی نرگس",
+ "bedRoom": 2,
+ "bedCount": 2,
+ "checkIn": "14:00",
+ "checkOut": "12:00",
+ "authenticationDocuments": "مدرک محرمیت لازم است",
+ "roomChildRateRule": "کودک زیر سه سال در صورتحساب لحاظ نمی گردد.",
+ "cancelRuleType": "Medium",
+ "hostName": "فاطمه  قنبری",
+ "hostId": 2999269,
+ "hostAverageResponseTime": 6,
+ "hostConfirmationPercentage": 81,
+ "beHostDateTime": "2023-07-03T21:54:40.2040464+03:30"
+}

@@ -1,0 +1,43 @@
+{
+ "@odata.context": "http://core.otaghak.com/odata/Otaghak/$metadata#RoomCalendarDetail",
+ "value": [
+  {
+   "id": 0,
+   "date": "2026-10-22T00:00:00+03:30",
+   "price": 4752000,
+   "beforeDiscountPrice": 4800000,
+   "hasDiscount": true,
+   "isInstant": true,
+   "isBlocked": false,
+   "blockedType": null,
+   "eventDateType": "Weekend",
+   "minNights": 1,
+   "maxNights": 30,
+   "isPublicHoliday": false,
+   "dom": 30,
+   "dow": 6,
+   "shamsiMonth": 7,
+   "shamsiYear": 1405,
+   "hasLateCheckout": false
+  },
+  {
+   "id": 0,
+   "date": "2026-10-23T00:00:00+03:30",
+   "price": 3564000,
+   "beforeDiscountPrice": 3600000,
+   "hasDiscount": true,
+   "isInstant": true,
+   "isBlocked": false,
+   "blockedType": null,
+   "eventDateType": "Normal",
+   "minNights": 1,
+   "maxNights": 30,
+   "isPublicHoliday": true,
+   "dom": 1,
+   "dow": 7,
+   "shamsiMonth": 8,
+   "shamsiYear": 1405,
+   "hasLateCheckout": false
+  }
+ ]
+}

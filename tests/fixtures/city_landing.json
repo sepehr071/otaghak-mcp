@@ -1,0 +1,20 @@
+{
+ "@odata.context": "http://core.otaghak.com/odata/Otaghak/$metadata#RoomCityLanding",
+ "value": [
+  {
+   "id": 201,
+   "faName": "رامسر",
+   "code": "ramsar"
+  },
+  {
+   "id": 205,
+   "faName": "نمک آبرود",
+   "code": "namakabrud"
+  },
+  {
+   "id": 206,
+   "faName": "کیش",
+   "code": "kish"
+  }
+ ]
+}

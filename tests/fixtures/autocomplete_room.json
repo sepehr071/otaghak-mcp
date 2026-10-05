@@ -1,0 +1,22 @@
+[
+ {
+  "url": "room/2508916",
+  "roomId": 2508916,
+  "type": "اقامتگاه",
+  "typeCode": "room",
+  "name": "سوییسی لیلی",
+  "state": "مازندران",
+  "stateCode": "mazandaran",
+  "city": "رامسر",
+  "cityCode": "ramsar",
+  "site": "مازندران",
+  "siteCode": null,
+  "box": "ramsar",
+  "boxCode": null,
+  "count": 1,
+  "order": "4",
+  "beInCampaign": false,
+  "imageUrl": "https://core.otaghak.com/api/v1/Media/images/4161758/5/3",
+  "personCapacity": 4
+ }
+]

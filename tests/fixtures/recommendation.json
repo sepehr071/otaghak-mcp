@@ -1,0 +1,5 @@
+{
+ "@odata.context": "http://core.otaghak.com/odata/Otaghak/$metadata#Otaghak.Dto.Point.GetRoomRecommendationDto",
+ "recommendationPercentage": 95,
+ "averageRoomVisitCount": 13
+}

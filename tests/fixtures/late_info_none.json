@@ -1,0 +1,6 @@
+{
+ "minLateCheckoutHours": 4,
+ "maxLateCheckoutHours": 0,
+ "lateCheckoutBasePrice": 0.0,
+ "lateCheckoutExtraHourlyPrice": 0.0
+}

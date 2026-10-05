@@ -1,0 +1,40 @@
+{
+ "roomBoxes": [
+  {
+   "id": 2508916,
+   "roomId": 2508916,
+   "roomName": "سوییسی لیلی",
+   "roomTypeName": "کلبه",
+   "area": 70,
+   "stateFaName": "مازندران",
+   "cityFaName": "رامسر",
+   "rate": 5.0,
+   "personCapacity": 4,
+   "extraPersonCapacity": 1,
+   "bedRoom": 1,
+   "bedCount": 2,
+   "hasDiscount": true,
+   "basePrice": 5000000.0,
+   "averagePrice": 0.0,
+   "afterDiscount": 3800000.0,
+   "afterDiscountAverage": 0.0,
+   "totalPrice": 0.0,
+   "totalNights": 0,
+   "totalDiscountValue": 24.0,
+   "longitude": 50.654515028,
+   "latitude": 36.92948276,
+   "roomMediaTitles": {
+    "mainImageTitle": "a80713aa-9527-4d50-a4c1-c858063d2ced.webp"
+   },
+   "isInstantBook": true,
+   "isPrimeRoom": false,
+   "commentsCount": 17,
+   "rentType": "Dedicate",
+   "basePersonCount": 0,
+   "extraPersonPriceBeforeDiscountAverage": 0.0,
+   "extraPersonPriceAfterDiscountAverage": 0.0,
+   "totalPriceWithExtraPerson": null
+  }
+ ],
+ "count": 1
+}

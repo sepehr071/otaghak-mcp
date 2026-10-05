@@ -1,0 +1,119 @@
+[
+ {
+  "name": "سرویس بهداشتی و حمام",
+  "order": 1,
+  "icon": "icon",
+  "items": [
+   {
+    "icon": "Bath-Room-Area-Icon",
+    "name": "سرویس بهداشتی-1",
+    "description": "روشویی، توالت ایرانی، توالت فرنگی، دوش",
+    "order": 1,
+    "count": 0,
+    "tag": null
+   }
+  ]
+ },
+ {
+  "name": "لوازم خانگی",
+  "order": 2,
+  "icon": "icon",
+  "items": [
+   {
+    "icon": "ic_canape",
+    "name": "مبلمان",
+    "description": "یک مبل ۳ نفره، یک مبل دو نفره، یک مبل یک نفره",
+    "order": 1,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_tv",
+    "name": "تلویزیون",
+    "description": "",
+    "order": 2,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_MizNaharkhori",
+    "name": "میزنهارخوری",
+    "description": "",
+    "order": 3,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_reciever",
+    "name": "گیرنده دیجیتال",
+    "description": "",
+    "order": 4,
+    "count": 0,
+    "tag": null
+   }
+  ]
+ },
+ {
+  "name": "امکانات آشپزی",
+  "order": 3,
+  "icon": "icon",
+  "items": [
+   {
+    "icon": "ic_gas",
+    "name": "اجاق گاز",
+    "description": "",
+    "order": 1,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_ref",
+    "name": "یخچال",
+    "description": "",
+    "order": 2,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_cooking",
+    "name": "لوازم آشپزی",
+    "description": "",
+    "order": 3,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_Sink",
+    "name": "سینک ظرفشویی",
+    "description": "",
+    "order": 4,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_LavazemeServGhaza-3",
+    "name": "لوازم سرو غذا",
+    "description": "",
+    "order": 5,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_teamaker",
+    "name": "چایی ساز",
+    "description": "",
+    "order": 6,
+    "count": 0,
+    "tag": null
+   },
+   {
+    "icon": "ic_washingstuff",
+    "name": "لوازم ظرفشویی",
+    "description": "",
+    "order": 7,
+    "count": 0,
+    "tag": null
+   }
+  ]
+ }
+]

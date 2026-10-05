@@ -1,0 +1,130 @@
+[
+ {
+  "displayType": "Header",
+  "className": null,
+  "rooms": null
+ },
+ {
+  "title": "تخفیف‌های داغ لحظه‌آخری",
+  "subTitle": "امروز رزرو کن، با تخفیف ویژه سفر کن",
+  "imageUrl": "https://cdn.otaghak.com/otg-images-new/Large/gnmjznnt.qrr.png",
+  "mobileImageUrl": "https://cdn.otaghak.com/otg-images-new/Large/dnze33wi.3g0.png",
+  "mobileImageBase64": null,
+  "desktopImageBase64": null,
+  "rooms": [
+   {
+    "roomId": 2433419,
+    "roomName": "بخارایی",
+    "seoTitle": "بخارایی",
+    "roomTypeName": "سوییت",
+    "cityFaName": "کاشان",
+    "rate": 5.0,
+    "totalPersonCapacity": 5,
+    "bedRoom": 1,
+    "hasDiscount": true,
+    "basePrice": 1800000.0,
+    "afterDiscount": 1260000.0,
+    "totalDiscountValue": 30.0,
+    "mainImageTitle": "2cc3f378-c99a-4b56-9d90-4226ed7cdbcb.webp",
+    "isInstantBook": false,
+    "isPrimeRoom": false,
+    "isNew": false,
+    "commentsCount": 22,
+    "badgeCodes": [
+     {
+      "name": "instant",
+      "title": "رزرو آنی",
+      "icon": "instant-colored.svg",
+      "priority": 2
+     }
+    ],
+    "roomFeatureIcons": [
+     "no-parking.svg",
+     "petnotallowed.svg"
+    ],
+    "videoUrl": "",
+    "thumbnailUrl": ""
+   },
+   {
+    "roomId": 2392793,
+    "roomName": "چوبی سعدی (۱)",
+    "seoTitle": "چوبی سعدی (۱)",
+    "roomTypeName": "کلبه",
+    "cityFaName": "ماسال",
+    "rate": 4.8,
+    "totalPersonCapacity": 6,
+    "bedRoom": 1,
+    "hasDiscount": true,
+    "basePrice": 3329000.0,
+    "afterDiscount": 1997400.0,
+    "totalDiscountValue": 40.0,
+    "mainImageTitle": "b834940b-e122-456c-b594-5a98cd151a91.webp",
+    "isInstantBook": false,
+    "isPrimeRoom": false,
+    "isNew": false,
+    "commentsCount": 64,
+    "badgeCodes": [
+     {
+      "name": "instant",
+      "title": "رزرو آنی",
+      "icon": "instant-colored.svg",
+      "priority": 2
+     }
+    ],
+    "roomFeatureIcons": [
+     "parking.svg",
+     "petnotallowed.svg"
+    ],
+    "videoUrl": "",
+    "thumbnailUrl": ""
+   },
+   {
+    "roomId": 2501800,
+    "roomName": "چیکا",
+    "seoTitle": "چیکا",
+    "roomTypeName": "ویلا",
+    "cityFaName": "صومعه‌سرا",
+    "rate": 5.0,
+    "totalPersonCapacity": 34,
+    "bedRoom": 2,
+    "hasDiscount": true,
+    "basePrice": 17500000.0,
+    "afterDiscount": 7175000.0,
+    "totalDiscountValue": 59.0,
+    "mainImageTitle": "290bfab0-a766-4a0a-a26c-b880a4ef2348.webp",
+    "isInstantBook": false,
+    "isPrimeRoom": false,
+    "isNew": false,
+    "commentsCount": 14,
+    "badgeCodes": [
+     {
+      "name": "instant",
+      "title": "رزرو آنی",
+      "icon": "instant-colored.svg",
+      "priority": 2
+     }
+    ],
+    "roomFeatureIcons": [
+     "parking.svg",
+     "petallowed.svg"
+    ],
+    "videoUrl": null,
+    "thumbnailUrl": null
+   }
+  ],
+  "links": null,
+  "blogPosts": null,
+  "order": 10,
+  "link": "/landing/lastsecond",
+  "displayType": "Rooms",
+  "cardType": "Noun",
+  "foregroundColorCode": null,
+  "backgroundColorCode": "#fdb913",
+  "effectiveTimeFrom": "14:00:00",
+  "effectiveTimeTo": "23:50:00",
+  "customParams": {
+   "maximumAvailableDiscount": 80.0
+  },
+  "className": "lastsecond"
+ }
+]

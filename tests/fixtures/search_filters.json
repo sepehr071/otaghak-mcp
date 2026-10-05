@@ -1,0 +1,515 @@
+{
+ "sections": [
+  {
+   "sectionName": "Price",
+   "title": "محدوده قیمت برای هر شب",
+   "type": "slider",
+   "isInFilter": true,
+   "children": [
+    {
+     "isInFilter": false,
+     "dataType": "int",
+     "fieldName": "minPrice",
+     "defaultValue": 40000
+    },
+    {
+     "isInFilter": false,
+     "dataType": "int",
+     "fieldName": "maxPrice",
+     "defaultValue": 90000000
+    }
+   ]
+  },
+  {
+   "sectionName": "BookingItems",
+   "type": "switch",
+   "isInFilter": true,
+   "children": [
+    {
+     "title": "رزرو آنی",
+     "description": "برای رزرو اقامتگاه نیازی به تایید از سمت میزبان نخواهید داشت.",
+     "isInFilter": false,
+     "value": true,
+     "dataType": "bool",
+     "fieldName": "instant",
+     "defaultValue": false
+    },
+    {
+     "title": "اقامتگاه پرایم",
+     "description": "اقامتگاه های دارای پک بهداشتی و رزرو آنی.",
+     "isInFilter": false,
+     "value": true,
+     "dataType": "bool",
+     "fieldName": "prime",
+     "defaultValue": false
+    },
+    {
+     "title": "اقامتگاه شبانه",
+     "description": "امکان رزرو برای امروز",
+     "isInFilter": false,
+     "value": true,
+     "dataType": "bool",
+     "fieldName": "nightly",
+     "defaultValue": false
+    }
+   ]
+  },
+  {
+   "sectionName": "BedRoom",
+   "title": "تعداد اتاق خواب",
+   "type": "number",
+   "isInFilter": true,
+   "dataType": "int",
+   "fieldName": "bedRoom",
+   "defaultValue": "مهم نیست"
+  },
+  {
+   "sectionName": "MinRate",
+   "title": "امتیاز",
+   "type": "radio",
+   "isInFilter": true,
+   "fieldName": "minRate",
+   "children": [
+    {
+     "title": "5",
+     "isInFilter": false,
+     "value": 5,
+     "dataType": "int"
+    },
+    {
+     "title": "بیشتر از ۴",
+     "isInFilter": false,
+     "value": 4,
+     "dataType": "int"
+    },
+    {
+     "title": "بیشتر از ۳",
+     "isInFilter": false,
+     "value": 3,
+     "dataType": "int"
+    }
+   ]
+  },
+  {
+   "sectionName": "PropertyFeatures",
+   "title": "ویژگی اقامتگاه",
+   "type": "checkbox",
+   "isInFilter": false,
+   "children": [
+    {
+     "title": "لب آب",
+     "toolTipText": "اقامتگاه‌های ساحلی، اطراف دریاچه و رودخانه",
+     "isInFilter": false,
+     "value": "20206|20207",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    },
+    {
+     "title": "خوش منظره",
+     "toolTipText": "اقامتگاه‌های دارای چشم‌انداز دلپذیر",
+     "isInFilter": false,
+     "value": "nice-view",
+     "dataType": "List",
+     "fieldName": "tagCodes"
+    }
+   ]
+  },
+  {
+   "sectionName": "Facilities",
+   "title": "امکانات رفاهی",
+   "type": "checkbox",
+   "isInFilter": true,
+   "children": [
+    {
+     "title": "استخر",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "130202|130201|130101|130102|130103|AGG1",
+     "dataType": "List",
+     "fieldName": "attributeValues",
+     "children": [
+      {
+       "title": "آب سرد",
+       "isInFilter": false,
+       "name": "دمای آب استخر",
+       "value": "130202:1302:XC1",
+       "dataType": "List",
+       "fieldName": "attributeValues"
+      },
+      {
+       "title": "آب گرم",
+       "isInFilter": false,
+       "name": "دمای آب استخر",
+       "value": "130201:1302:XC1",
+       "dataType": "List",
+       "fieldName": "attributeValues"
+      },
+      {
+       "title": "سرپوشیده داخل",
+       "isInFilter": false,
+       "name": "نوع استخر",
+       "value": "130101:1301:XC1",
+       "dataType": "List",
+       "fieldName": "attributeValues"
+      },
+      {
+       "title": "سرپوشیده بیرون",
+       "isInFilter": false,
+       "name": "نوع استخر",
+       "value": "130102:1301:XC1",
+       "dataType": "List",
+       "fieldName": "attributeValues"
+      },
+      {
+       "title": "روباز",
+       "isInFilter": false,
+       "name": "نوع استخر",
+       "value": "130103:1301:XC1",
+       "dataType": "List",
+       "fieldName": "attributeValues"
+      }
+     ]
+    },
+    {
+     "title": "جکوزی",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "1707|1708",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "پارکینگ",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "1201|1202|1203|1401",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "بیلیارد",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "1803",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "وان",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "1708|1006",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "سیستم صوتی",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "1505",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "آلاچیق",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "2006",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "سونا",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "1705|1706",
+     "dataType": "List",
+     "fieldName": "attribute"
+    }
+   ]
+  },
+  {
+   "sectionName": "TemperatureControl",
+   "title": "مجهز به",
+   "type": "checkbox",
+   "isInFilter": true,
+   "dataType": "List",
+   "children": [
+    {
+     "title": "سرویس سرمایشی",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "801|802|AGG2",
+     "dataType": "List",
+     "fieldName": "attribute",
+     "children": [
+      {
+       "title": "کولر آبی",
+       "isInFilter": false,
+       "value": "802:8:XC2",
+       "dataType": "List",
+       "fieldName": "attribute"
+      },
+      {
+       "title": "کولر گازی",
+       "isInFilter": false,
+       "value": "801:8:XC2",
+       "dataType": "List",
+       "fieldName": "attribute"
+      }
+     ]
+    },
+    {
+     "title": "سرویس گرمایشی",
+     "type": "checkbox",
+     "isInFilter": false,
+     "value": "701|702|706|707|704|703|AGG3",
+     "dataType": "List",
+     "fieldName": "attribute",
+     "children": [
+      {
+       "title": "بخاری هیزمی",
+       "isInFilter": false,
+       "value": "706:7:XC3",
+       "dataType": "List",
+       "fieldName": "attribute"
+      },
+      {
+       "title": "شوفاژ",
+       "isInFilter": false,
+       "value": "702:7:XC3",
+       "dataType": "List",
+       "fieldName": "attribute"
+      },
+      {
+       "title": "بخاری گازی",
+       "isInFilter": false,
+       "value": "701:7:XC3",
+       "dataType": "List",
+       "fieldName": "attribute"
+      },
+      {
+       "title": "گرمایش از کف",
+       "isInFilter": false,
+       "value": "707:7:XC3",
+       "dataType": "List",
+       "fieldName": "attribute"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sectionName": "BasicServices",
+   "title": "امکانات اولیه",
+   "type": "checkbox",
+   "isInFilter": true,
+   "dataType": "List",
+   "children": [
+    {
+     "title": "توالت فرنگی",
+     "isInFilter": false,
+     "value": "1003|1004",
+     "dataType": "List",
+     "fieldName": "attribute"
+    },
+    {
+     "title": "توالت ایرانی",
+     "isInFilter": false,
+     "value": "1002",
+     "dataType": "List",
+     "fieldName": "attribute"
+    }
+   ]
+  },
+  {
+   "sectionName": "RoomTypes",
+   "title": "نوع اقامتگاه",
+   "type": "checkbox",
+   "isInFilter": false,
+   "children": [
+    {
+     "title": "ویلا",
+     "isInFilter": false,
+     "value": 138,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "آپارتمان",
+     "isInFilter": false,
+     "value": 137,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "کلبه",
+     "isInFilter": false,
+     "value": 154,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "خانه",
+     "isInFilter": false,
+     "value": 157,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "سوییت",
+     "isInFilter": false,
+     "value": 139,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "هتل آپارتمان",
+     "isInFilter": false,
+     "value": 141,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "مهمانسرا",
+     "isInFilter": false,
+     "value": 156,
+     "dataType": "List",
+     "fieldName": "type"
+    },
+    {
+     "title": "بوم‌گردی",
+     "isInFilter": false,
+     "value": 142,
+     "dataType": "List",
+     "fieldName": "type"
+    }
+   ]
+  },
+  {
+   "sectionName": "Environment",
+   "title": "منطقه اقامتگاه",
+   "type": "checkbox",
+   "isInFilter": false,
+   "children": [
+    {
+     "title": "ساحلی",
+     "isInFilter": false,
+     "value": "20206:RA",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    },
+    {
+     "title": "جنگلی",
+     "isInFilter": false,
+     "value": "20203:RA",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    },
+    {
+     "title": "ییلاقی",
+     "isInFilter": false,
+     "value": "20205:RA",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    },
+    {
+     "title": "بیابانی",
+     "isInFilter": false,
+     "value": "20105|20204:RA",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    },
+    {
+     "title": "شهری",
+     "isInFilter": false,
+     "value": "20201:RA",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    },
+    {
+     "title": "روستایی",
+     "isInFilter": false,
+     "value": "20202:RA",
+     "dataType": "List",
+     "fieldName": "attributeValues"
+    }
+   ]
+  },
+  {
+   "sectionName": "RentType",
+   "title": "نوع اجاره",
+   "type": "checkbox",
+   "isInFilter": true,
+   "children": [
+    {
+     "title": "دربست",
+     "toolTipText": "اقامتگاهی که تمامی امکانات از جمله حیاط، راهروها و... به طور کامل در اختیار مهمان قرار می‌گیرد.",
+     "isInFilter": false,
+     "value": "Dedicate",
+     "dataType": "List",
+     "fieldName": "rentTypes"
+    },
+    {
+     "title": "نیمه دربست",
+     "toolTipText": "اقامتگاهی که بعضی از امکانات آن مانند حیاط و راهرو مشترک است.",
+     "isInFilter": false,
+     "value": "SemiDedicate",
+     "dataType": "List",
+     "fieldName": "rentTypes"
+    },
+    {
+     "title": "غیر دربست ",
+     "toolTipText": "اقامتگاهی که تمامی امکانات آن اشتراکی است، مانند سرویس بهداشتی مشترک و...",
+     "isInFilter": false,
+     "value": "Shared",
+     "dataType": "List",
+     "fieldName": "rentTypes"
+    }
+   ]
+  },
+  {
+   "sectionName": "Rules",
+   "title": "قوانین اقامتگاه",
+   "type": "checkbox",
+   "isInFilter": true,
+   "children": [
+    {
+     "title": "امکان رزرو با کارت شناسایی معتبر",
+     "isInFilter": false,
+     "value": "30102",
+     "dataType": "List",
+     "fieldName": "ruleValues"
+    },
+    {
+     "title": "امکان همراه داشتن حیوان خانگی",
+     "isInFilter": false,
+     "value": "10101|10103|10102",
+     "dataType": "List",
+     "fieldName": "ruleValues"
+    },
+    {
+     "title": "امکان برگزاری مراسم",
+     "isInFilter": false,
+     "value": "10201|10202",
+     "dataType": "List",
+     "fieldName": "ruleValues"
+    },
+    {
+     "title": "امکان استعمال دخانیات داخل ساختمان",
+     "isInFilter": false,
+     "value": "10401",
+     "dataType": "List",
+     "fieldName": "ruleValues"
+    },
+    {
+     "title": "امکان استفاده از باغ و حیاط",
+     "isInFilter": false,
+     "value": "10601",
+     "dataType": "List",
+     "fieldName": "ruleValues"
+    }
+   ]
+  }
+ ]
+}

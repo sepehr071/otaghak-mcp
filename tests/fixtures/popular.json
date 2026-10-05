@@ -1,0 +1,67 @@
+{
+ "id": 0,
+ "popularCities": [
+  {
+   "id": 282,
+   "faName": "تهران",
+   "enName": "tehran",
+   "url": "city/tehran",
+   "imageUrl": "https://core.otaghak.com/Content/Images/Cities/282.jpg",
+   "roomCount": 832,
+   "state": "تهران",
+   "stateCode": "tehran"
+  },
+  {
+   "id": 201,
+   "faName": "رامسر",
+   "enName": "ramsar",
+   "url": "city/ramsar",
+   "imageUrl": "https://core.otaghak.com/Content/Images/Cities/201.jpg",
+   "roomCount": 1241,
+   "state": "مازندران",
+   "stateCode": "mazandaran"
+  },
+  {
+   "id": 10552,
+   "faName": "سهیلیه",
+   "enName": "soheyliyeh",
+   "url": "city/soheyliyeh",
+   "imageUrl": "https://core.otaghak.com/Content/Images/Cities/10552.jpg",
+   "roomCount": 347,
+   "state": "البرز",
+   "stateCode": "alborz"
+  }
+ ],
+ "popularTags": [
+  {
+   "id": 1674050,
+   "faName": "اجاره اقامتگاه با تخفیف",
+   "enName": "discounted",
+   "url": "landing/discounted",
+   "imageUrl": "https://core.otaghak.com/Content/Images/Tags/1674050.jpg",
+   "roomCount": 1699,
+   "state": null,
+   "stateCode": null
+  },
+  {
+   "id": 2331079,
+   "faName": "اقامتگاه‌های مناسب افراد خاص‌پسند",
+   "enName": "extraordinary",
+   "url": "landing/extraordinary",
+   "imageUrl": "https://core.otaghak.com/Content/Images/Tags/6008.jpg",
+   "roomCount": 975,
+   "state": null,
+   "stateCode": null
+  },
+  {
+   "id": 2331077,
+   "faName": "رزرو اقامتگاه‌های پرایم با پک بهداشتی",
+   "enName": "otaghak-prime",
+   "url": "landing/otaghak-prime",
+   "imageUrl": "https://core.otaghak.com/Content/Images/Tags/2331077.jpg",
+   "roomCount": 705,
+   "state": null,
+   "stateCode": null
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+[
+ {
+  "id": 230,
+  "cityId": 282,
+  "faName": "برج میلاد",
+  "enName": "Milad Tower",
+  "districtType": "Tourist",
+  "districtTypeTitle": "مناطق گردشگری",
+  "latitude": 35.74472061951526,
+  "longitude": 51.37536932510792,
+  "radius": 4.0,
+  "measurementUnit": "kilometer",
+  "order": 1,
+  "isArchived": false,
+  "cityName": null
+ },
+ {
+  "id": 231,
+  "cityId": 282,
+  "faName": "کاخ گلستان",
+  "enName": "Golestan Palac",
+  "districtType": "Tourist",
+  "districtTypeTitle": "مناطق گردشگری",
+  "latitude": 35.67994640737454,
+  "longitude": 51.42052513306578,
+  "radius": 2.0,
+  "measurementUnit": "kilometer",
+  "order": 2,
+  "isArchived": false,
+  "cityName": null
+ },
+ {
+  "id": 232,
+  "cityId": 282,
+  "faName": "بازار بزرگ تهران",
+  "enName": "Bazaar",
+  "districtType": "Tourist",
+  "districtTypeTitle": "مناطق گردشگری",
+  "latitude": 35.67226993681819,
+  "longitude": 51.41647392732432,
+  "radius": 3.0,
+  "measurementUnit": "kilometer",
+  "order": 3,
+  "isArchived": false,
+  "cityName": null
+ }
+]

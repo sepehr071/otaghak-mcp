@@ -1,0 +1,65 @@
+{
+ "points": [
+  {
+   "point": 5.0,
+   "iconName": "vacuum",
+   "title": "نظافت و تمیزی"
+  },
+  {
+   "point": 5.0,
+   "iconName": "tax-check",
+   "title": "صحت اطلاعات"
+  },
+  {
+   "point": 5.0,
+   "iconName": "user-check",
+   "title": "نحوه پذیرش"
+  },
+  {
+   "point": 5.0,
+   "iconName": "comment_heart",
+   "title": "ارتباط میزبان"
+  },
+  {
+   "point": 4.9,
+   "iconName": "cctv",
+   "title": "امنیت محله"
+  },
+  {
+   "point": 5.0,
+   "iconName": "map-marker-check",
+   "title": "ارزش اقامتگاه"
+  }
+ ],
+ "progresses": [
+  {
+   "score": 5,
+   "count": 20,
+   "progressPercent": 100.0
+  },
+  {
+   "score": 4,
+   "count": 0,
+   "progressPercent": 0.0
+  },
+  {
+   "score": 3,
+   "count": 0,
+   "progressPercent": 0.0
+  },
+  {
+   "score": 2,
+   "count": 0,
+   "progressPercent": 0.0
+  },
+  {
+   "score": 1,
+   "count": 0,
+   "progressPercent": 0.0
+  }
+ ],
+ "totalCount": 20,
+ "score": 5.0,
+ "title": "امتیاز 5.0 از 5",
+ "subTitle": "از 20 نظر ثبت شده"
+}
