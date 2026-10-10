@@ -209,7 +209,8 @@ async def ot_similar_rooms(
     check_out: CheckOut = None,
     guests: Guests = None,
 ) -> dict[str, Any]:
-    """Get 4-5 alternatives to a room (same city and type), as the room page shows them.
+    """Get 4-5 alternatives to a room (same city and type), as the room page shows them (or, while that list is
+    empty upstream, a search of the room's city and type up to 1.5x its price; `note` says so).
 
     Without dates prices are undated starting prices (not tonight's). With check_in/check_out the
     rooms are re-priced for that stay; rooms that are booked or too small for `guests` are listed in
@@ -219,7 +220,7 @@ async def ot_similar_rooms(
     data = await fetch(f"{CORE}/api/v1/Rooms/GetSimilarRooms", method="POST", json={"roomId": room_id})
     similar = (data or {}).get("rooms") or []
     if not similar:
-        raise ToolError(f"No similar rooms for {room_id} (unknown id or no matches). Try ot_search_rooms in its city.")
+        return await _same_city_and_type(room_id, check_in, check_out, guests, nights)
     if not nights:
         return {
             "room_id": room_id,
@@ -247,6 +248,42 @@ async def ot_similar_rooms(
         "rooms": sorted(rooms, key=lambda r: r["stay_total"]),
         "not_available": [int(i) for i in ids if i not in priced],
     }
+
+
+async def _same_city_and_type(room_id: int, check_in: Any, check_out: Any, guests: int | None, nights: int) -> dict:
+    """GetSimilarRooms answers no rooms for every room since 2026-10 (the room page calls it too): search the room's
+    city and type with the carousel's price ceiling (about 1.5x the room's starting price) instead."""
+    one = await fetch(
+        f"{CORE}/api/v3/RoomSearch/SearchRooms",
+        method="POST",
+        json={"roomIds": [str(room_id)], "skip": 0, "take": 1},
+        expect=dict,
+    )
+    me = next(iter(one.get("rooms") or []), None)
+    if not me or not me.get("cityCode"):
+        raise ToolError(f"No similar rooms for {room_id} (unknown id or no matches). Try ot_search_rooms in its city.")
+    price = me.get("afterDiscount") or me.get("basePrice")
+    body = {
+        "cities": [me["cityCode"]],
+        "type": [me["roomTypeId"]] if me.get("roomTypeId") else [],
+        "sortingType": "OtaghakSuggestions",
+        "checkIn": str(check_in) if nights else None,
+        "checkOut": str(check_out) if nights else None,
+        "person": guests,
+        "maxPrice": round(price * 1.5) if price else None,  # ponytail: the carousel's ceiling formula is unknown
+        "skip": 0,
+        "take": 6,
+    }
+    found = await fetch(f"{CORE}/api/v3/RoomSearch/SearchRooms", method="POST", json=body, expect=dict)
+    rows = [r for r in found.get("rooms") or [] if r.get("roomId") != room_id][:5]
+    rooms = [card(r, guests, check_in if nights else None, check_out if nights else None) for r in rows]
+    out: dict[str, Any] = {"room_id": room_id, "dated": bool(nights)}
+    if nights:
+        out |= {"nights": nights, "rooms": sorted(rooms, key=lambda r: r["stay_total"]), "not_available": []}
+    else:
+        out["rooms"] = rooms
+    out["note"] = "Same city and room type (the site's similar-rooms list is empty for now)."
+    return out
 
 
 @tool("Host profile")

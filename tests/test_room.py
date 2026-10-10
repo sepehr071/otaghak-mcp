@@ -170,6 +170,41 @@ async def test_ot_similar_rooms_dated(client, api):
     assert sent["roomIds"] == ["2512254", "2493334", "2470263", "2497656", "2497478"] and sent["person"] == 4
 
 
+async def test_ot_similar_rooms_falls_back_to_same_city_and_type(client, api):
+    # Since 2026-10 GetSimilarRooms answers no rooms for every room (seen live for 6 rooms on 2026-10-10).
+    api["GetSimilarRooms"] = {"viewAllLink": None, "rooms": []}
+    search = fixture("search_rooms.json")
+    me = search["rooms"][0]["roomId"]
+
+    def search_rooms(request):
+        sent = body(request)
+        if sent.get("roomIds"):
+            return httpx.Response(
+                200,
+                json={
+                    "rooms": [
+                        {
+                            "roomId": me,
+                            "roomTypeId": 154,
+                            "cityCode": "ramsar",
+                            "afterDiscount": 3900000.0,
+                            "basePrice": 5000000.0,
+                        }
+                    ]
+                },
+            )
+        return httpx.Response(200, json=search)
+
+    api["SearchRooms"] = search_rooms
+    args = {"room_id": me, "check_in": "2026-10-20", "check_out": "2026-10-23", "guests": 2}
+    data = (await client.call_tool("ot_similar_rooms", args)).structured_content
+    assert data["dated"] and data["rooms"] and me not in [r["id"] for r in data["rooms"]] and "note" in data
+    assert all(r["stay_total"] > 0 for r in data["rooms"])
+    sent = body(api.sent("SearchRooms")[1])
+    assert (sent["cities"], sent["type"], sent["maxPrice"], sent["person"]) == (["ramsar"], [154], 5850000, 2)
+    assert sent["checkIn"] == "2026-10-20"
+
+
 async def test_ot_host_by_room(client, api):
     api["GetRoomPdp"] = {"roomInfo": {"hostId": 1626813}}
     api["GetUserPublicProfileInfo"] = fixture("host_profile.json")

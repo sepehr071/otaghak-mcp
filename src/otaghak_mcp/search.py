@@ -403,7 +403,8 @@ def card(
     r: dict[str, Any], guests: int | None, check_in: date | None, check_out: date | None, from_search: bool = True
 ) -> dict[str, Any]:
     """Compact room card from a search-shaped room (search, similar rooms, host rooms)."""
-    nights = r.get("totalNights") or 0
+    # A dated 1-night search answers totalNights 0: count the nights from the dates.
+    nights = r.get("totalNights") or ((check_out - check_in).days if check_in and check_out else 0)
     cap, extra_cap = r.get("personCapacity") or 0, r.get("extraPersonCapacity") or 0
     # Search and host rooms send the total (base + extra) in `personCapacity`; similar rooms send the base count.
     base, max_guests = (r.get("basePersonCount") or cap - extra_cap, cap) if from_search else (cap, cap + extra_cap)

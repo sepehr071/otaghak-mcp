@@ -107,6 +107,14 @@ async def test_ot_search_rooms_dated(client, api):
     assert sent["attribute"] == ["1201|1202|1203|1401"] and sent["attributeValues"] == ["200201|200202"]
 
 
+def test_card_one_night():
+    # A dated 1-night search answers totalNights 0 (seen live 2026-10-10): the card stays dated.
+    room = {**fixture("search_rooms.json")["rooms"][0], "totalNights": 0}
+    c = search.card(room, 2, date(2026, 10, 20), date(2026, 10, 21))
+    assert c["url"].endswith("?checkIn=2026-10-20&checkOut=2026-10-21") and c["stay_total"] > 0
+    assert c["price_per_night"] == room["afterDiscountAverage"]
+
+
 async def test_ot_search_rooms_undated(client, api):
     api["SearchRooms"] = fixture("search_rooms_undated.json")
     data = (
