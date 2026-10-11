@@ -159,7 +159,7 @@ like `ramsar` (city), `mazandaran` (province) or `beach` (collection).
 |---|---|
 | `ot_room` | Details, amenities, rules, check-in/out times, cancellation policy, host, location, photos |
 | `ot_reviews` | Rating, star histogram, category scores, percent who recommend, reviews with host replies |
-| `ot_similar_rooms` | 4-5 alternatives, re-priced and checked for your dates and guests |
+| `ot_similar_rooms` | 4-5 alternatives, re-priced and checked for your dates and guests; while the site's list is empty, a same-city, same-type search up to 1.5x the room's price (`note` says so) |
 | `ot_host` | Host response time, response and acceptance rates, other rooms, newest reviews |
 </details>
 
