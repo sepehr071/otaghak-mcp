@@ -2,11 +2,11 @@
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/sepehr071/otaghak-mcp/main/.github/banner.png" alt="otaghak-mcp: let your AI agent find the real price of a stay on Otaghak" width="100%">
+<img src="https://raw.githubusercontent.com/sepehr071/otaghak-mcp/main/.github/banner.png" alt="otaghak-mcp: unofficial Otaghak MCP server for Claude, Cursor and Copilot" width="100%">
 
-# 🏡 otaghak-mcp
+# 🏡 otaghak-mcp: Otaghak MCP server for AI agents
 
-**Let your AI agent find a place to stay on Otaghak.**<br>
+**Unofficial, read-only MCP server for Otaghak (اتاقک): let your AI agent find a place to stay in Iran.**<br>
 Search villas, cottages and apartments across Iran, check which nights are free, get the exact price<br>
 for your dates and guests, and read reviews and host stats, all from Claude, Cursor or Copilot.
 
@@ -25,7 +25,19 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 
 ---
 
-## Why
+## For AI agents
+
+- **What:** unofficial, read-only MCP server for Otaghak (اتاقک), an Iranian marketplace for villas, cottages and apartments. Queries work best in Persian, English slugs work too; prices are in Toman.
+- **Install:** `claude mcp add otaghak -- uvx otaghak-mcp` (stdio transport; needs Python 3.10+ and [uv](https://docs.astral.sh/uv/getting-started/installation/)).
+- **Auth:** none, no API key. Optional `OTAGHAK_MCP_PROXY` (HTTP proxy) if Otaghak blocks your network.
+- **Access:** read-only. No login, booking, payment or SMS codes, so no confirmation is needed before calling tools.
+- **Tools:** 15, all prefixed `ot_*`. Start with `ot_find_place`, then `ot_search_rooms` → `ot_room` or `ot_room_calendar` → `ot_price_quote`. For bargains use `ot_deals`.
+- **Use when:** finding a stay in Iran and getting the exact total for dates and guests, with reviews and host stats.
+- **Do not use when:** you need to book or pay (the user does that on otaghak.com), or want prices past the open calendar (end of the next Jalali month, at most 20 nights).
+- **Output:** compact JSON. Prices in Toman, dates Gregorian `YYYY-MM-DD` (`check_out` is the departure day), ratings 0-5. Pass the numeric room id between tools.
+- **Machine-readable:** [`server.json`](https://github.com/sepehr071/otaghak-mcp/blob/main/server.json); catalog of all Iranian MCP servers: [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp) ([TOOLS.md](https://github.com/sepehr071/awesome-iran-mcp/blob/main/TOOLS.md), [servers.json](https://github.com/sepehr071/awesome-iran-mcp/blob/main/servers.json), [llms.txt](https://github.com/sepehr071/awesome-iran-mcp/blob/main/llms.txt)).
+
+## Why use Otaghak MCP
 
 On Otaghak the price on a listing card is rarely what you pay: every night has its own price, weekends cost
 more, discounts change per night, extra guests cost extra per night, and calendars only open about a month
@@ -198,6 +210,28 @@ All 15 tools are annotated `readOnlyHint: true` and return compact structured JS
 ## FAQ
 
 <details>
+<summary><b>Is there an Otaghak API or MCP server for AI agents?</b></summary>
+
+`otaghak-mcp` is an unofficial MCP server for Otaghak: it exposes the public endpoints of otaghak.com as 15
+read-only tools, so an agent can search stays and get exact prices. (Otaghak's own booking web service is for
+partners under contract; this is not it.)
+</details>
+
+<details>
+<summary><b>How do I use Otaghak with Claude, Cursor or Copilot?</b></summary>
+
+Install it with `uvx otaghak-mcp` (see [Quick start](#quick-start)), then ask in Persian or English, for example
+"cheapest villa with a pool near Ramsar for 6 people next weekend, with the exact total".
+</details>
+
+<details>
+<summary><b>Is it official, safe and free?</b></summary>
+
+It is unofficial and MIT licensed, so free to use. It is read-only: no login, no API key, no booking or payment,
+and it runs on your machine.
+</details>
+
+<details>
 <summary><b>Can it book a room for me?</b></summary>
 
 No, and that's deliberate. It has no login and never calls booking, payment, OTP/SMS, wallet, favorites or review
@@ -245,11 +279,13 @@ npx @modelcontextprotocol/inspector uvx otaghak-mcp
 |---|---|---|
 | `OTAGHAK_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port` |
 
-## فارسی
+<a id="فارسی"></a>
+
+## فارسی: سرور MCP اتاقک
 
 <div dir="rtl">
 
-**otaghak-mcp** به دستیار هوش مصنوعی شما (Claude، Cursor، Copilot و ...) اجازه می&zwnj;دهد در اتاقک ویلا، کلبه و
+**otaghak-mcp** یک سرور MCP غیررسمی برای اتاقک در ایران است که به دستیار هوش مصنوعی شما (Claude، Cursor، Copilot و ...) اجازه می&zwnj;دهد در اتاقک ویلا، کلبه و
 آپارتمان جستجو کند، شب&zwnj;های خالی را ببیند، مبلغ دقیق اقامت را برای تاریخ و تعداد نفرات شما حساب کند و نظرات و
 وضعیت میزبان را بخواند.
 
@@ -257,6 +293,7 @@ npx @modelcontextprotocol/inspector uvx otaghak-mcp
 - مبلغ نهایی را با قیمت تک&zwnj;تک شب&zwnj;ها، هزینه نفر اضافه و تأخیر در تخلیه حساب می&zwnj;کند.
 - همه قیمت&zwnj;ها به تومان است و تاریخ&zwnj;ها میلادی (YYYY-MM-DD) هستند.
 - روی سیستم خود شما اجرا می&zwnj;شود و به هیچ سرور واسطی داده نمی&zwnj;فرستد.
+- برای پیدا کردن آن در گوگل یا رجیستری MCP، «سرور MCP اتاقک» یا «otaghak mcp» را جستجو کنید.
 
 **نصب در Claude Code:**
 
@@ -288,6 +325,15 @@ API changes.
 
 Releases: bump the version in `pyproject.toml` and `server.json`, then push a `v*` tag. GitHub Actions tests,
 publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.io), and creates the GitHub Release.
+
+## Related servers
+
+- [Jabama MCP server](https://github.com/sepehr071/jabama-mcp) for villas, tours and events
+- [Flytoday MCP server](https://github.com/sepehr071/flytoday-mcp) for flights, hotels and villas
+- [MrBilit MCP server](https://github.com/sepehr071/mrbilit-mcp) for flights, trains, buses and hotels
+- All servers: [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp), the catalog of Iranian MCP servers
+
+If this saves you clicks, a star helps others find it.
 
 ## Disclaimer
 
