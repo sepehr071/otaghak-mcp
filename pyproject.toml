@@ -1,6 +1,6 @@
 [project]
 name = "otaghak-mcp"
-version = "0.1.2"
+version = "0.1.3"
 description = "Unofficial read-only MCP server for Otaghak: search Iranian villas and cottages, check availability, exact stay prices, reviews and hosts."
 readme = "README.md"
 license = "MIT"
