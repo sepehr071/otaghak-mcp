@@ -30,8 +30,7 @@ async def test_ot_room(client, api):
     # dated average of 4.5M + 5M + 5M; afterDiscount 0 means no discount
     assert data["price"] == {
         "dated": True,
-        "price_per_night": 4833300,
-        "price_per_night_before_discount": 4833300,
+        "price_per_night": 4833300,  # no before-discount key: no discount
         "discount_pct": 0,
         "extra_guest_per_night_before_discount": 500000,
     }
@@ -118,10 +117,12 @@ async def test_ot_reviews(client, api):
         "rating": 5.0,
         "recommends": "yes",
         "text": "همه چيز عالى بشدت پيشنهاد ميكنم \nبرخورد عالى ميزبان و پاسخگويي سريع\nامكانات داخل كلبه\nموقعيت خوب كلبه",
-        "pros": ["برخورد عالی میزبان", "پاسخگویی سریع", "امکانات مناسب داخل کلبه", "موقعیت خوب کلبه"],
-        "cons": [],
-        "host_reply": None,
-        "photos": [],
+        "pros": [
+            "برخورد عالی میزبان",
+            "پاسخگویی سریع",
+            "امکانات مناسب داخل کلبه",
+        ],  # first 3 + count; empty keys are absent
+        "pros_more": 1,
     }
     assert data["reviews"][1]["host_reply"] == "ممنون از شما"
     assert dict(api.sent("GetAllByRoomId")[0].url.params) == {"roomId": "2508916", "take": "4", "skip": "3"}
@@ -241,3 +242,13 @@ async def test_ot_host_unknown(client, api):
 async def test_ot_host_needs_an_id(client, api):
     result = await client.call_tool("ot_host", {})
     assert result.is_error and not api.calls
+
+
+def test_review_full_text_and_dropped_points_marker():
+    from otaghak_mcp.room import review
+
+    c = {"body": "x" * 500, "positivePoints": ["a", "b", "c", "d", "e"], "negativePoints": ["n"]}
+    short, full = review(c), review(c, True)
+    assert short["text"].endswith("[cut]") and short["pros"] == ["a", "b", "c"] and short["pros_more"] == 2
+    assert "cons_more" not in short
+    assert full["text"] == "x" * 500 and len(full["pros"]) == 5 and "pros_more" not in full

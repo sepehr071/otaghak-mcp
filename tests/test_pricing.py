@@ -24,14 +24,11 @@ async def test_ot_room_calendar(client, api):
         "jalali": "1405/07/29",
         "weekday": "Wed",
         "available": True,
-        "price": 5000000,
-        "price_before_discount": 5000000,
+        "price": 5000000,  # no price_before_discount / holiday / late_checkout keys: no discount, no, no
         "instant": True,
         "min_nights": 1,
         "max_nights": 30,
         "weekend": True,
-        "holiday": False,
-        "late_checkout": False,
     }
     assert data["days"][3]["holiday"] and data["days"][3]["jalali"] == "1405/08/01"
     assert "(roomId=2512254,startDate=2026-10-20,endDate=2026-10-23)" in api.calls[0].url.path

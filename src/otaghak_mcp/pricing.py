@@ -12,32 +12,29 @@ from pydantic import Field
 from .http import CORE, ODATA, fetch
 from .registry import tool
 from .room import RoomId
-from .search import check_date, horizon, jalali, room_url, stay, today
+from .search import check_date, drop_empty, horizon, jalali, room_url, stay, today
 
-LateHours = Annotated[
-    int | None, Field(ge=1, le=10, description="Late checkout hours to add (offered rooms only, usually 4), e.g. 4.")
-]
+LateHours = Annotated[int | None, Field(ge=1, le=10, description="Late checkout hours to add (offered rooms), e.g. 4.")]
+
+
+def jalali_str(d: date) -> str:
+    return "{}/{:02d}/{:02d}".format(*jalali(d))
 
 
 @tool("Room calendar")
 async def ot_room_calendar(
     room_id: RoomId,
-    start: Annotated[
-        date | None, Field(description="First day, Gregorian YYYY-MM-DD, e.g. '2026-10-20'. Default: today.")
-    ] = None,
+    start: Annotated[date | None, Field(description="First day YYYY-MM-DD, e.g. '2026-10-20'. Default: today.")] = None,
     end: Annotated[
-        date | None,
-        Field(
-            description="Last day (inclusive), e.g. '2026-11-20'. Default: 30 days after start. Days past the open calendar (end of next Jalali month) are not returned."
-        ),
+        date | None, Field(description="Last day (inclusive), e.g. '2026-11-20'. Default: start + 30 days.")
     ] = None,
 ) -> dict[str, Any]:
     """Get a room's calendar day by day: nightly price after and before discount (Toman), free or booked,
-    instant booking, minimum and maximum nights when arriving that day, weekend, public holiday,
-    late checkout.
+    instant booking, min and max nights when arriving that day, weekend, public holiday, late checkout.
 
-    A night is priced on its arrival day. Calendars open only to the end of next Jalali month. Use to
-    find free dates, the cheapest nights or allowed stay lengths. Next: ot_price_quote for a stay.
+    A night is priced on its arrival day. Absent keys: price_before_discount = no discount, instant /
+    weekend / holiday / late_checkout = no. Use to find free dates, cheap nights or allowed stay lengths.
+    Next: ot_price_quote for a stay.
     """
     t = today()
     start, last = start or t, horizon(t)
@@ -52,20 +49,24 @@ async def ot_room_calendar(
         end = start + timedelta(days=1)  # the API needs end after start
     days = await calendar(room_id, start, end)
     out = [
-        {
-            "date": d["date"][:10],
-            "jalali": f"{d.get('shamsiYear')}/{d.get('shamsiMonth'):02d}/{d.get('dom'):02d}",
-            "weekday": date.fromisoformat(d["date"][:10]).strftime("%a"),
-            "available": not d.get("isBlocked"),
-            "price": d.get("price"),
-            "price_before_discount": d.get("beforeDiscountPrice"),
-            "instant": d.get("isInstant"),
-            "min_nights": d.get("minNights"),
-            "max_nights": d.get("maxNights"),
-            "weekend": d.get("eventDateType") == "Weekend",
-            "holiday": d.get("isPublicHoliday"),
-            "late_checkout": d.get("hasLateCheckout"),
-        }
+        drop_empty(
+            {
+                "date": d["date"][:10],
+                "jalali": jalali_str(date.fromisoformat(d["date"][:10])),
+                "weekday": date.fromisoformat(d["date"][:10]).strftime("%a"),
+                "available": not d.get("isBlocked"),
+                "price": d.get("price"),
+                "price_before_discount": d.get("beforeDiscountPrice")
+                if d.get("beforeDiscountPrice") != d.get("price")
+                else None,
+                "instant": d.get("isInstant") or None,
+                "min_nights": d.get("minNights"),
+                "max_nights": d.get("maxNights"),
+                "weekend": d.get("eventDateType") == "Weekend" or None,
+                "holiday": d.get("isPublicHoliday") or None,
+                "late_checkout": d.get("hasLateCheckout") or None,
+            }
+        )
         for d in days
     ]
     free = [d for d in out if d["available"]]
@@ -81,24 +82,23 @@ async def ot_room_calendar(
 @tool("Exact stay price")
 async def ot_price_quote(
     room_id: RoomId,
-    check_in: Annotated[date, Field(description="Arrival day, Gregorian YYYY-MM-DD, e.g. '2026-10-20'.")],
-    check_out: Annotated[date, Field(description="Departure day, e.g. '2026-10-23'. At most 20 nights.")],
-    guests: Annotated[int, Field(ge=1, le=50, description="Number of guests, e.g. 4.")],
+    check_in: Annotated[date, Field(description="Arrival day YYYY-MM-DD, e.g. '2026-10-20'.")],
+    check_out: Annotated[date, Field(description="Departure day, e.g. '2026-10-23' (max 20 nights).")],
+    guests: Annotated[int, Field(ge=1, le=50, description="Guests, e.g. 4.")],
     late_checkout_hours: LateHours = None,
 ) -> dict[str, Any]:
     """Get the amount to pay (Toman) for a room, dates and guests: nights_total (the room page's
-    payable amount for the base guests), the extra-guest charge above the base guests (after
-    discount), optional late checkout, and the total. `nightly` is the calendar breakdown; discounted
-    nights there are rounded to 1,000 each, so they can add up to a little more than nights_total.
+    payable amount for the base guests), the extra-guest charge, optional late checkout, and the total.
+    `nightly` is the calendar breakdown (each discounted night is rounded to 1,000, so it can add up to
+    a little more than nights_total; price_before_discount is absent when there is no discount).
 
     Also checks that every night is free, the stay length is allowed and the room takes that many
     guests (available=false with a reason otherwise). Late checkout that cannot be booked keeps the
-    quote, with late_checkout.available=false. Coupons and wallet credit need login and are not
-    included. Use before the user books on otaghak.com.
+    quote, with late_checkout.available=false. Use before the user books on otaghak.com.
     """
     nights = stay(check_in, check_out)
-    days = await calendar(room_id, check_in, check_out)
     calls = [
+        calendar(room_id, check_in, check_out),
         fetch(
             f"{CORE}/api/v3/RoomSearch/SearchRooms",
             method="POST",
@@ -114,7 +114,7 @@ async def ot_price_quote(
     ]
     if late_checkout_hours:
         calls.append(late_info(room_id))
-    found, *late = await asyncio.gather(*calls)
+    days, found, *late = await asyncio.gather(*calls)
     by_day = {d["date"][:10]: d for d in days}
     stay_days = [by_day.get(str(check_in + timedelta(days=i))) for i in range(nights)]
     out: dict[str, Any] = {
@@ -166,7 +166,15 @@ async def ot_price_quote(
         "available": True,
         "instant": all(d.get("isInstant") for d in stay_days),
         "nightly": [
-            {"date": d["date"][:10], "price": d["price"], "price_before_discount": d.get("beforeDiscountPrice")}
+            drop_empty(
+                {
+                    "date": d["date"][:10],
+                    "price": d["price"],
+                    "price_before_discount": d.get("beforeDiscountPrice")
+                    if d.get("beforeDiscountPrice") != d["price"]
+                    else None,
+                }
+            )
             for d in stay_days
         ],
         "nights_total": nights_total,
@@ -182,8 +190,8 @@ async def ot_price_quote(
 
 @tool("Holidays and weekdays")
 async def ot_holidays(
-    start: Annotated[date, Field(description="First day, Gregorian YYYY-MM-DD, e.g. '2026-10-20'.")],
-    end: Annotated[date, Field(description="Last day (inclusive), e.g. '2026-12-31'. At most a year after start.")],
+    start: Annotated[date, Field(description="First day YYYY-MM-DD, e.g. '2026-10-20'.")],
+    end: Annotated[date, Field(description="Last day (inclusive), e.g. '2026-12-31'; max a year after start.")],
 ) -> dict[str, Any]:
     """List Iranian public holidays (Fridays included) in a date range, with Jalali dates and weekdays.
 
@@ -202,12 +210,12 @@ async def ot_holidays(
     return {
         "start": str(start),
         "end": str(end),
-        "start_jalali": "{}/{:02d}/{:02d}".format(*jalali(start)),
-        "end_jalali": "{}/{:02d}/{:02d}".format(*jalali(end)),
+        "start_jalali": jalali_str(start),
+        "end_jalali": jalali_str(end),
         "holidays": [
             {
                 "date": d["date"][:10],
-                "jalali": f"{d.get('shamsiYear')}/{d.get('shamsiMonth'):02d}/{d.get('doM'):02d}",
+                "jalali": jalali_str(date.fromisoformat(d["date"][:10])),
                 "weekday": date.fromisoformat(d["date"][:10]).strftime("%A"),
             }
             for d in holidays
@@ -218,9 +226,7 @@ async def ot_holidays(
 @tool("Late checkout")
 async def ot_late_checkout(
     room_id: RoomId,
-    check_out: Annotated[
-        date | None, Field(description="Departure day to check, Gregorian YYYY-MM-DD, e.g. '2026-10-23'.")
-    ] = None,
+    check_out: Annotated[date | None, Field(description="Departure day to check, e.g. '2026-10-23'.")] = None,
 ) -> dict[str, Any]:
     """Check whether a room offers late checkout, for how many hours and at what price (Toman, a unit
     not confirmed on the site), and with check_out whether it can be booked on that departure day

@@ -82,12 +82,9 @@ async def test_ot_search_rooms_dated(client, api):
         "bedrooms": 1,
         "area_m2": 40,
         "rent_type": "semi_private",
-        "price_per_night": 1083333,
-        "price_per_night_before_discount": 1083333,
+        "price_per_night": 1083333,  # no before-discount / instant / prime keys: no discount, not instant, not prime
         "discount_pct": 0,
         "stay_total": 5049999,  # 3,249,999 for 2 guests + 2 extra x 300,000 x 3 nights
-        "instant": False,
-        "prime": False,
         "location": {"lat": 36.873, "lon": 50.768},
         "photo": "https://cdn.otaghak.com/otg-images-new/X500/78513dd4-5262-4a64-bd42-b21a46af48f2.webp",
         "url": "https://www.otaghak.com/room/2512604/?checkIn=2026-10-20&checkOut=2026-10-23",

@@ -10,9 +10,9 @@ from typing import Annotated, Any, Literal
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import Field
 
-from .http import BLOG, CORE, ODATA, WWW, ApiError, fetch
+from .http import BLOG, CACHE_SECONDS, CORE, ODATA, WWW, ApiError, fetch
 from .registry import tool
-from .search import Slug
+from .search import FullText, Slug, clip
 
 PAGES = {"terms": "term-of-service", "host_rules": "host-rules", "quality_policy": "quality-policy"}
 
@@ -22,16 +22,11 @@ async def ot_help(
     topic: Annotated[
         Literal["faq", "terms", "host_rules", "quality_policy"],
         Field(
-            description="faq: the help-center FAQ; terms: guest terms of use (booking, cancellation policies, refunds, wallet, stay rules); host_rules; quality_policy."
+            description="faq, terms (booking, cancellation policies, refunds, wallet, stay rules), host_rules, quality_policy."
         ),
     ] = "faq",
     query: Annotated[
-        str | None,
-        Field(
-            min_length=2,
-            max_length=60,
-            description="Words to look for, Persian works best, e.g. 'لغو' (cancellation) or 'کیف پول' (wallet).",
-        ),
+        str | None, Field(min_length=2, max_length=60, description="Persian words to look for, e.g. 'لغو', 'کیف پول'.")
     ] = None,
 ) -> dict[str, Any]:
     """Read Otaghak's help center: the FAQ, or the guest terms (booking and cancellation rules,
@@ -42,7 +37,7 @@ async def ot_help(
     """
     words = query.split() if query else []
     if topic == "faq":
-        faq = await fetch(f"{CORE}/api/v1/Faq/GetAllForFaqPage")
+        faq = await fetch(f"{CORE}/api/v1/Faq/GetAllForFaqPage", ttl=CACHE_SECONDS)
         items = [
             {"question": (f.get("question") or "").strip(), "answer": html_text(f.get("answer"))} for f in faq or []
         ]
@@ -50,7 +45,7 @@ async def ot_help(
             return {"topic": topic, "items": [i | {"answer": i["answer"][:200]} for i in items]}
         hits = [i for i in items if matches(i["question"] + " " + i["answer"], words)]
         return {"topic": topic, "query": query, "items": [i | {"answer": i["answer"][:2000]} for i in hits[:8]]}
-    page = await fetch(f"{CORE}/api/v1/Content/GetContent", {"enTitle": PAGES[topic]})
+    page = await fetch(f"{CORE}/api/v1/Content/GetContent", {"enTitle": PAGES[topic]}, ttl=CACHE_SECONDS)
     if not page:
         raise ToolError(f"The {topic} page is not available right now.")
     sections = split_sections(page.get("body") or "")
@@ -71,19 +66,14 @@ async def ot_help(
 
 @tool("Destination travel guide")
 async def ot_travel_guide(
-    place: Annotated[
-        Slug, Field(description="City, province or collection slug, e.g. 'ramsar', 'mazandaran', 'beach'.")
-    ],
+    place: Annotated[Slug, Field(description="City, province or collection slug, e.g. 'ramsar', 'beach'.")],
     kind: Annotated[Literal["city", "province", "collection"], Field(description="What `place` is.")] = "city",
     blog_query: Annotated[
         str | None,
-        Field(
-            min_length=2,
-            max_length=60,
-            description="Blog search words, e.g. 'رستوران رامسر'. Default: the place's Persian name.",
-        ),
+        Field(min_length=2, max_length=60, description="Blog search words, e.g. 'رستوران رامسر'. Default: place name."),
     ] = None,
-    max_chars: Annotated[int, Field(ge=500, le=12000, description="Max characters of the guide text.")] = 3000,
+    max_chars: Annotated[int, Field(ge=500, le=12000, description="Max characters of the guide text.")] = 2000,
+    full_text: FullText = False,
 ) -> dict[str, Any]:
     """Get the site's travel guide for a destination: guide text, the destination's FAQ (best season,
     sights, prices), related search pages (city themes such as beach, cottage, apartment with listing
@@ -93,10 +83,24 @@ async def ot_travel_guide(
     related_pages go to ot_search_rooms `city_tag`.
     """
     route = {"city": "city", "province": "province", "collection": "landing"}[kind]
+    faq_type = {"city": "City", "collection": "Tag"}.get(kind)
+
+    async def faq() -> Any:
+        if not faq_type:
+            return []
+        try:
+            return await fetch(f"{CORE}/api/v1/Faq/GetByEnName", {"enName": place, "type": faq_type}, ttl=CACHE_SECONDS)
+        except ApiError:  # 500 = no FAQ for this slug
+            return []
+
     try:
-        info = await fetch(
-            f"{ODATA}/RoomSearchSeo/GetSearchInfo(route='{route}',code='{place}',permalink='',houseType=0)",
-            expect=dict,
+        info, faqs = await asyncio.gather(
+            fetch(
+                f"{ODATA}/RoomSearchSeo/GetSearchInfo(route='{route}',code='{place}',permalink='',houseType=0)",
+                expect=dict,
+                ttl=CACHE_SECONDS,
+            ),
+            faq(),
         )
     except ApiError as e:
         if e.status == 500:
@@ -105,17 +109,7 @@ async def ot_travel_guide(
             ) from e
         raise
     name = info.get("faName") or place
-    faq_type = {"city": "City", "collection": "Tag"}.get(kind)
-
-    async def faq() -> Any:
-        if not faq_type:
-            return []
-        try:
-            return await fetch(f"{CORE}/api/v1/Faq/GetByEnName", {"enName": place, "type": faq_type})
-        except ApiError:  # 500 = no FAQ for this slug
-            return []
-
-    faqs, posts = await asyncio.gather(faq(), fetch(f"{BLOG}/search", {"search": blog_query or name, "per_page": 6}))
+    posts = await fetch(f"{BLOG}/search", {"search": blog_query or name, "per_page": 6}, ttl=CACHE_SECONDS)
     return {
         "name": name,
         "slug": info.get("enName") or place,
@@ -123,7 +117,7 @@ async def ot_travel_guide(
         "province": info.get("faStateName") or None,
         "title": info.get("h1Title"),
         "url": f"{WWW}/{route}/{place}/",
-        "guide": html_text(info.get("description"))[:max_chars],
+        "guide": html_text(info.get("description"))[: None if full_text else max_chars],
         "related_pages": [
             {
                 "title": r.get("title"),
@@ -134,7 +128,10 @@ async def ot_travel_guide(
             for r in info.get("relatedSearchs") or []
         ],
         "cities": [{"slug": c.get("enName"), "name": c.get("faName")} for c in info.get("cities") or []],
-        "faq": [{"question": f.get("question"), "answer": html_text(f.get("answer"))[:600]} for f in faqs or []],
+        "faq": [
+            {"question": f.get("question"), "answer": clip(html_text(f.get("answer")), None if full_text else 600)}
+            for f in faqs or []
+        ],
         "blog": [{"title": html.unescape(p.get("title") or ""), "url": p.get("url")} for p in posts or []],
     }
 

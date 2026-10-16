@@ -11,7 +11,20 @@ from pydantic import Field
 
 from .http import CORE, ODATA, WWW, ApiError, fetch
 from .registry import tool
-from .search import RENT_NAMES, CheckIn, CheckOut, Guests, card, photo_url, rating, room_url, stay
+from .search import (
+    RENT_NAMES,
+    CheckIn,
+    CheckOut,
+    FullText,
+    Guests,
+    card,
+    clip,
+    drop_empty,
+    photo_url,
+    rating,
+    room_url,
+    stay,
+)
 
 RoomId = Annotated[int, Field(ge=1, le=999_999_999, description="Room id (code), e.g. 2512254.")]
 
@@ -33,6 +46,7 @@ async def ot_room(
     check_in: CheckIn = None,
     check_out: CheckOut = None,
     max_photos: Annotated[int, Field(ge=0, le=40, description="Photo URLs to return.")] = 8,
+    full_text: FullText = False,
 ) -> dict[str, Any]:
     """Get one room: description, capacity, rooms and beds, amenities, house rules, check-in/out times,
     cancellation policy, host, nearby places, approximate location, photos and nightly price.
@@ -80,87 +94,92 @@ async def ot_room(
     media = [m.get("name") for m in (sections.get("Images") or {}).get("media") or []]
     location = sections.get("Map") or {}
     base, extra = info.get("personCount") or 0, info.get("extraPersonCount") or 0
-    return {
-        "id": info.get("roomId"),
-        "name": info.get("roomName"),
-        "url": room_url(info.get("roomId"), check_in, check_out),
-        "active": info.get("isActive"),
-        "type": crumb.get("roomType"),
-        "city": crumb.get("cityName"),
-        "city_slug": crumb.get("cityEnName"),
-        "province": crumb.get("stateName"),
-        "province_slug": crumb.get("stateEnName"),
-        "description": (info.get("description") or "").strip()[:1500],
-        "base_guests": base,
-        "max_guests": base + extra,
-        "bedrooms": detail.get("bedRoom"),
-        "beds": detail.get("bedCount"),
-        "area_m2": seo.get("area"),
-        "rent_type": RENT_NAMES.get(seo.get("rentType"), seo.get("rentType")),
-        "about": {i.get("name"): i.get("description") for i in items("AboutRoom") if i.get("description")},
-        "rating": rating(seo.get("rate"), seo.get("rateCount")),
-        # seo `commentCount` can be twice the written reviews (16 vs 8 for 2510831): use the rating count only.
-        "rating_count": seo.get("rateCount"),
-        "successful_bookings": seo.get("successfulBookingCount"),
-        "instant_on_some_nights": seo.get("isInstant"),  # room flag; per night it can be off (2388753)
-        "prime": seo.get("isPrime"),
-        "last_second_discount": seo.get("isLastSecondDiscount"),
-        "price": {
-            "dated": bool(nights),
-            "price_per_night": after,
-            "price_per_night_before_discount": before,
-            "discount_pct": round(price.get("totalDiscountValue") or 0, 1),
-            "extra_guest_per_night_before_discount": price.get("extraPersonPrice"),
-        },
-        "check_in": "-".join(check_in_window),
-        "check_out": detail.get("checkOut"),
-        "rules": [i.get("name") for i in items("RoomRules") + items("RoomHostRule") if i.get("name")],
-        "documents_required": detail.get("authenticationDocuments") or None,
-        "child_rule": detail.get("roomChildRateRule") or None,
-        "cancel_policy": {
-            "type": detail.get("cancelRuleType"),
-            "title": cancel.get("cancelRuleTitle"),
-            "guest_penalties": [
-                {"when": i.get("title"), "penalty": i.get("description")} for i in cancel.get("items") or []
+    return drop_empty(
+        {
+            "id": info.get("roomId"),
+            "name": info.get("roomName"),
+            "url": room_url(info.get("roomId"), check_in, check_out),
+            "active": info.get("isActive"),
+            "type": crumb.get("roomType"),
+            "city": crumb.get("cityName"),
+            "city_slug": crumb.get("cityEnName"),
+            "province": crumb.get("stateName"),
+            "province_slug": crumb.get("stateEnName"),
+            "description": clip(info.get("description"), None if full_text else 1500),
+            "base_guests": base,
+            "max_guests": base + extra,
+            "bedrooms": detail.get("bedRoom"),
+            "beds": detail.get("bedCount"),
+            "area_m2": seo.get("area"),
+            "rent_type": RENT_NAMES.get(seo.get("rentType"), seo.get("rentType")),
+            "about": {i.get("name"): i.get("description") for i in items("AboutRoom") if i.get("description")},
+            "rating": rating(seo.get("rate"), seo.get("rateCount")),
+            # seo `commentCount` can be twice the written reviews (16 vs 8 for 2510831): use the rating count only.
+            "rating_count": seo.get("rateCount"),
+            "successful_bookings": seo.get("successfulBookingCount"),
+            "instant_on_some_nights": seo.get("isInstant"),  # room flag; per night it can be off (2388753)
+            "prime": seo.get("isPrime"),
+            "last_second_discount": seo.get("isLastSecondDiscount"),
+            "price": drop_empty(
+                {
+                    "dated": bool(nights),
+                    "price_per_night": after,
+                    "price_per_night_before_discount": before if before != after else None,
+                    "discount_pct": round(price.get("totalDiscountValue") or 0, 1),
+                    "extra_guest_per_night_before_discount": price.get("extraPersonPrice"),
+                }
+            ),
+            "check_in": "-".join(check_in_window),
+            "check_out": detail.get("checkOut"),
+            "rules": [i.get("name") for i in items("RoomRules") + items("RoomHostRule") if i.get("name")],
+            "documents_required": detail.get("authenticationDocuments") or None,
+            "child_rule": detail.get("roomChildRateRule") or None,
+            "cancel_policy": {
+                "type": detail.get("cancelRuleType"),
+                "title": cancel.get("cancelRuleTitle"),
+                "guest_penalties": [
+                    {"when": i.get("title"), "penalty": i.get("description")} for i in cancel.get("items") or []
+                ],
+            },
+            "amenities": {
+                g.get("name"): [
+                    f"{i.get('name')} ({clip(i['description'], None if full_text else 120)})"
+                    if (i.get("description") or "").strip()
+                    else i.get("name")
+                    for i in g.get("items") or []
+                ]
+                for g in amenities or []
+            },
+            "nearby": [
+                {
+                    "place": (i.get("name") or "").strip(),
+                    "walk": i.get("footPathDescription"),
+                    "drive": i.get("drivePathDescription"),
+                }
+                for i in items("CityFacility")
             ],
-        },
-        "amenities": {
-            g.get("name"): [
-                f"{i.get('name')} ({i['description'].strip()})"
-                if (i.get("description") or "").strip()
-                else i.get("name")
-                for i in g.get("items") or []
-            ]
-            for g in amenities or []
-        },
-        "nearby": [
-            {
-                "place": (i.get("name") or "").strip(),
-                "walk": i.get("footPathDescription"),
-                "drive": i.get("drivePathDescription"),
-            }
-            for i in items("CityFacility")
-        ],
-        "mobile_signal": {i.get("name"): i.get("description") for i in items("BTS")},
-        "host": {
-            "id": info.get("hostId"),
-            "name": " ".join((detail.get("hostName") or "").split()),
-            # Room-detail host stats are often defaults (60 min, 0%): ot_host has the real ones.
-            "host_since": (detail.get("beHostDateTime") or "")[:10] or None,
-        },
-        "location": {"lat": location.get("latitude"), "lon": location.get("longitude"), "approximate": True}
-        if location.get("latitude")
-        else None,
-        "photo_count": len(media),
-        "photos": [photo_url(m) for m in media[:max_photos]],
-    }
+            "mobile_signal": {i.get("name"): i.get("description") for i in items("BTS")},
+            "host": {
+                "id": info.get("hostId"),
+                "name": " ".join((detail.get("hostName") or "").split()),
+                # Room-detail host stats are often defaults (60 min, 0%): ot_host has the real ones.
+                "host_since": (detail.get("beHostDateTime") or "")[:10] or None,
+            },
+            "location": {"lat": location.get("latitude"), "lon": location.get("longitude"), "approximate": True}
+            if location.get("latitude")
+            else None,
+            "photo_count": len(media),
+            "photos": [photo_url(m) for m in media[:max_photos]],
+        }
+    )
 
 
 @tool("Room reviews and rating")
 async def ot_reviews(
     room_id: RoomId,
-    limit: Annotated[int, Field(ge=1, le=50, description="Reviews per page.")] = 10,
-    page: Annotated[int, Field(ge=0, le=100, description="Zero-based page number.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=50, description="Reviews per page.")] = 5,
+    page: Annotated[int, Field(ge=0, le=100, description="Zero-based page.")] = 0,
+    full_text: FullText = False,
 ) -> dict[str, Any]:
     """Get a room's rating (0-5), star histogram, six category scores, percent of guests who recommend it,
     and written reviews, newest first (with host replies).
@@ -198,7 +217,7 @@ async def ot_reviews(
         "recommend_pct": (rec or {}).get("recommendationPercentage") if points else None,
         "page": page,
         "has_more": len(reviews or []) > limit,
-        "reviews": [review(c) for c in (reviews or [])[:limit]],
+        "reviews": [review(c, full_text) for c in (reviews or [])[:limit]],
     }
 
 
@@ -288,10 +307,11 @@ async def _same_city_and_type(room_id: int, check_in: Any, check_out: Any, guest
 
 @tool("Host profile")
 async def ot_host(
-    host_id: Annotated[int | None, Field(ge=1, description="Host (user) id, e.g. 1626813.")] = None,
-    room_id: Annotated[int | None, Field(ge=1, description="Or a room id to look up its host, e.g. 2512254.")] = None,
-    rooms_limit: Annotated[int, Field(ge=0, le=30, description="Host's rooms to list.")] = 10,
-    reviews_limit: Annotated[int, Field(ge=0, le=30, description="Newest reviews across the host's rooms.")] = 5,
+    host_id: Annotated[int | None, Field(ge=1, description="Host id, e.g. 1626813.")] = None,
+    room_id: Annotated[int | None, Field(ge=1, description="Or a room id, to find its host.")] = None,
+    rooms_limit: Annotated[int, Field(ge=0, le=30, description="Host's rooms to list.")] = 6,
+    reviews_limit: Annotated[int, Field(ge=0, le=30, description="Newest reviews across the host's rooms.")] = 3,
+    full_text: FullText = False,
 ) -> dict[str, Any]:
     """Check a host: response time, response and acceptance rates, member since, active rooms
     (undated starting prices) and the newest guest reviews across all their rooms.
@@ -327,36 +347,44 @@ async def ot_host(
         raise ToolError(f"User {host_id} is not a host.")
     rooms = rest.pop(0) if rooms_limit else {}
     reviews = rest.pop(0) if reviews_limit else {}
-    return {
-        "id": p.get("id"),
-        "name": " ".join(f"{p.get('userFirstName') or ''} {p.get('userLastName') or ''}".split()),
-        "url": f"{WWW}/profile/{p.get('id')}/",
-        "about": (p.get("biography") or "").strip() or None,
-        "city": p.get("cityFaName"),
-        "province": p.get("stateFaName"),
-        "host_since": (p.get("registeredDate") or "")[:10] or None,
-        "response_minutes": p.get("hostResponseTime") or None,
-        "response_rate_pct": p.get("hostResponsesPercentage"),
-        "acceptance_pct": p.get("confirmationPercent"),
-        "active_rooms": p.get("hostRoomsCount"),
-        "replies_to_reviews": p.get("repliesCount"),
-        "rooms": [card(r, None, None, None) for r in (rooms or {}).get("roomBoxes") or []],
-        "reviews": [review(c) for c in (reviews or {}).get("comments") or []],
-    }
+    return drop_empty(
+        {
+            "id": p.get("id"),
+            "name": " ".join(f"{p.get('userFirstName') or ''} {p.get('userLastName') or ''}".split()),
+            "url": f"{WWW}/profile/{p.get('id')}/",
+            "about": clip(p.get("biography"), None if full_text else 500) or None,
+            "city": p.get("cityFaName"),
+            "province": p.get("stateFaName"),
+            "host_since": (p.get("registeredDate") or "")[:10] or None,
+            "response_minutes": p.get("hostResponseTime") or None,
+            "response_rate_pct": p.get("hostResponsesPercentage"),
+            "acceptance_pct": p.get("confirmationPercent"),
+            "active_rooms": p.get("hostRoomsCount"),
+            "replies_to_reviews": p.get("repliesCount"),
+            "rooms": [card(r, None, None, None) for r in (rooms or {}).get("roomBoxes") or []],
+            "reviews": [review(c, full_text) for c in (reviews or {}).get("comments") or []],
+        }
+    )
 
 
-def review(c: dict[str, Any]) -> dict[str, Any]:
+def review(c: dict[str, Any], full: bool = False) -> dict[str, Any]:
     """Compact guest review (room and host review lists share the shape)."""
     replies = [r.get("body") for r in c.get("replies") or [] if r.get("isFromHost") and r.get("body")]
-    return {
-        "date": (c.get("creationDateTime") or "")[:10],
-        "room_id": c.get("roomId"),
-        "name": (c.get("senderDisplayName") or "").strip(),
-        "rating": round(c["point"], 1) if c.get("point") else None,
-        "recommends": RECOMMENDS.get(c.get("recomendationType")),
-        "text": (c.get("body") or "").strip()[:800],
-        "pros": [p.strip() for p in c.get("positivePoints") or []],
-        "cons": [p.strip() for p in c.get("negativePoints") or []],
-        "host_reply": replies[0][:500] if replies else None,
-        "photos": [photo_url(m.get("name"), "Medium") for m in c.get("pdpMediaObject") or [] if m.get("name")],
-    }
+    pros, cons = c.get("positivePoints") or [], c.get("negativePoints") or []
+    keep = None if full else 3  # beyond 3 points only a count is kept (full_text returns all)
+    return drop_empty(
+        {
+            "date": (c.get("creationDateTime") or "")[:10],
+            "room_id": c.get("roomId"),
+            "name": (c.get("senderDisplayName") or "").strip(),
+            "rating": round(c["point"], 1) if c.get("point") else None,
+            "recommends": RECOMMENDS.get(c.get("recomendationType")),
+            "text": clip(c.get("body"), None if full else 400),
+            "pros": [clip(p, None if full else 120) for p in pros[:keep]],
+            "pros_more": len(pros) - keep if keep and len(pros) > keep else None,
+            "cons": [clip(p, None if full else 120) for p in cons[:keep]],
+            "cons_more": len(cons) - keep if keep and len(cons) > keep else None,
+            "host_reply": clip(replies[0], None if full else 300) if replies else None,
+            "photos": [photo_url(m.get("name"), "Medium") for m in c.get("pdpMediaObject") or [] if m.get("name")],
+        }
+    )
