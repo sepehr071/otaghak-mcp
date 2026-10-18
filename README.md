@@ -29,7 +29,7 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 
 - **What:** unofficial, read-only MCP server for Otaghak (اتاقک), an Iranian marketplace for villas, cottages and apartments. Queries work best in Persian, English slugs work too; prices are in Toman.
 - **Install:** `claude mcp add otaghak -- uvx otaghak-mcp` (stdio transport; needs Python 3.10+ and [uv](https://docs.astral.sh/uv/getting-started/installation/)).
-- **Auth:** none, no API key. Optional `OTAGHAK_MCP_PROXY` (HTTP proxy) if Otaghak blocks your network.
+- **Auth:** none, no API key. Optional `OTAGHAK_MCP_PROXY` (HTTP proxy, or a comma-separated list) if Otaghak blocks your network.
 - **Access:** read-only. No login, booking, payment or SMS codes, so no confirmation is needed before calling tools.
 - **Tools:** 15, all prefixed `ot_*`. Start with `ot_find_place`, then `ot_search_rooms` → `ot_room` or `ot_room_calendar` → `ot_price_quote`. For bargains use `ot_deals`.
 - **Use when:** finding a stay in Iran and getting the exact total for dates and guests, with reviews and host stats.
@@ -255,8 +255,10 @@ outside Iran were not tested; if Otaghak blocks one, set `OTAGHAK_MCP_PROXY`.
 <details>
 <summary><b>I get "did not answer in time" or "Could not reach"</b></summary>
 
-The server retries a failed connection once (timeouts are not retried). If it keeps failing, check your connection
+The server retries a timeout, failed connection, 5xx or 429 up to twice with a short backoff. If it keeps failing, check your connection
 or set `OTAGHAK_MCP_PROXY`. Normal system proxy variables are ignored on purpose, because direct calls are the fastest.
+If Otaghak shows a bot-check page, install the optional browser fallback: `pip install "otaghak-mcp[browser]"` (or
+`uvx --from "otaghak-mcp[browser]" otaghak-mcp`), then run `patchright install chromium`.
 </details>
 
 <details>
@@ -277,7 +279,7 @@ npx @modelcontextprotocol/inspector uvx otaghak-mcp
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `OTAGHAK_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port` |
+| `OTAGHAK_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port`. A comma-separated list is used one at a time: the next proxy takes over when one is blocked (403/429) or cannot connect |
 
 <a id="فارسی"></a>
 
@@ -314,8 +316,8 @@ claude mcp add otaghak -- uvx otaghak-mcp
 ```bash
 git clone https://github.com/sepehr071/otaghak-mcp && cd otaghak-mcp
 uv sync
-uv run pytest            # offline, against recorded responses
-uv run pytest -m live    # real API
+uv run python -m pytest            # offline, against recorded responses
+uv run python -m pytest -m live    # real API
 uv run ruff check .
 ```
 
