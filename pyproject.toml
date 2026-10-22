@@ -1,13 +1,13 @@
 [project]
 name = "otaghak-mcp"
-version = "0.3.0"
+version = "0.3.1"
 description = "Unofficial read-only MCP server for Otaghak: search Iranian villas and cottages, check availability, exact stay prices, reviews and hosts."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Sepehr Radmard", email = "sepehrr80@gmail.com" }]
 requires-python = ">=3.10"
-keywords = ["mcp", "model-context-protocol", "otaghak", "iran", "travel", "vacation-rental", "villa", "booking"]
+keywords = ["mcp", "mcp-server", "model-context-protocol", "otaghak", "iran", "persian", "farsi", "travel", "vacation-rental", "villa", "cottage", "accommodation", "booking", "ai-agents"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",

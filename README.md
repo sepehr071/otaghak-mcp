@@ -19,7 +19,7 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=otaghak&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJvdGFnaGFrLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_otaghak--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=otaghak&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22otaghak-mcp%22%5D%7D)
 
-[Quick start](#quick-start) · [What it can do](#what-it-can-do) · [Tools](#tools) · [FAQ](#faq) · [فارسی](#فارسی)
+[For AI agents](#for-ai-agents) · [Why](#why) · [What it can do](#what-it-can-do) · [Quick start](#quick-start) · [Tools](#tools) · [How it works](#how-it-works) · [Good to know](#good-to-know) · [FAQ](#faq) · [Configuration](#configuration) · [فارسی](#فارسی) · [Development](#development) · [Related servers](#related-servers) · [Disclaimer](#disclaimer) · [License](#license)
 
 </div>
 
@@ -37,7 +37,7 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 - **Output:** compact JSON. Prices in Toman, dates Gregorian `YYYY-MM-DD` (`check_out` is the departure day), ratings 0-5. Pass the numeric room id between tools.
 - **Machine-readable:** [`server.json`](https://github.com/sepehr071/otaghak-mcp/blob/main/server.json); catalog of all Iranian MCP servers: [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp) ([TOOLS.md](https://github.com/sepehr071/awesome-iran-mcp/blob/main/TOOLS.md), [servers.json](https://github.com/sepehr071/awesome-iran-mcp/blob/main/servers.json), [llms.txt](https://github.com/sepehr071/awesome-iran-mcp/blob/main/llms.txt)).
 
-## Why use Otaghak MCP
+## Why
 
 On Otaghak the price on a listing card is rarely what you pay: every night has its own price, weekends cost
 more, discounts change per night, extra guests cost extra per night, and calendars only open about a month
@@ -56,8 +56,8 @@ An agent with `otaghak-mcp` does the clicking:
 > | 1 extra guest (3 nights) | 980,000 | 1,200,000 |
 > | **Total to pay** | **13,230,000** | |
 >
-> The cottage includes 3 guests and takes at most 4, so the 4th person costs 400,000 a night (discounted like the
-> nights). All three nights are free and bookable instantly. Want me to compare it with `ot_similar_rooms`?
+> The cottage includes 3 guests and takes at most 4, so the 4th person costs 400,000 a night (discounted too, at a slightly
+> different rate than the nights). All three nights are free and bookable instantly. Want me to compare it with `ot_similar_rooms`?
 
 <sub>Real tool output from 2026-10-04; prices change all the time. Prices are in Toman.</sub>
 
@@ -119,6 +119,42 @@ Click **Install in VS Code** above, or add to `.vscode/mcp.json`:
 </details>
 
 <details>
+<summary><b>Codex CLI</b></summary>
+
+```bash
+codex mcp add otaghak -- uvx otaghak-mcp
+```
+
+Or in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.otaghak]
+command = "uvx"
+args = ["otaghak-mcp"]
+```
+</details>
+
+<details>
+<summary><b>Gemini CLI</b></summary>
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "otaghak": { "command": "uvx", "args": ["otaghak-mcp"] }
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Add the Claude Desktop block to `~/.codeium/windsurf/mcp_config.json`.
+</details>
+
+<details>
 <summary><b>Anything else</b></summary>
 
 It's a standard stdio MCP server: run `uvx otaghak-mcp`, or `pip install otaghak-mcp` and run `otaghak-mcp`.
@@ -129,7 +165,11 @@ Then just ask:
 - "Cheapest villa with a pool near Ramsar for 6 people next weekend?"
 - "Is room 2512254 free from 20 to 23 October, and what's the total for 5 guests?"
 - "Pet-friendly cottages in Gilan with a rating of 4 or more."
+- "Show the reviews and the host's response rate for room 2512254, then suggest similar rooms for the same dates."
+- "Which Iranian holidays fall in the next month, and is late checkout offered by this room?"
 - <span dir="rtl">یک کلبه جنگلی در ماسال برای ۴ نفر، آخر هفته بعد، با رزرو آنی پیدا کن.</span>
+- <span dir="rtl">قیمت نهایی ویلای شماره ۲۵۱۲۲۵۴ برای ۵ نفر از ۲۰ تا ۲۳ اکتبر چقدر می&zwnj;شود؟</span>
+- <span dir="rtl">تخفیف&zwnj;دارترین اقامتگاه&zwnj;های شمال را نشان بده.</span>
 
 ## How it works
 
@@ -204,7 +244,7 @@ All 15 tools are annotated `readOnlyHint: true` and return compact structured JS
 - **Dates** are Gregorian `YYYY-MM-DD` and `check_out` is the departure day. No past dates, at most 20 nights, and hosts' calendars open only to the end of the next Jalali month; the tools say so clearly instead of returning an empty list. A Jalali date gets an error with its Gregorian twin.
 - **Guests:** each room includes `base_guests` in its price and takes up to `max_guests`. `ot_price_quote` checks the limit itself (the site's own search doesn't when you ask for a specific room).
 - **Ratings are 0–5**; `null` means not rated yet. Holiday flags are only published about 7 weeks ahead.
-- **Location** is approximate (about 100 m); the exact address and the host's phone come only after booking.
+- **Location** is approximate; the exact address and the host's phone come only after booking.
 - **Persian queries match best** (`رامسر`, `کلبه`), English slugs work too.
 
 ## FAQ
@@ -296,6 +336,8 @@ npx @modelcontextprotocol/inspector uvx otaghak-mcp
 - همه قیمت&zwnj;ها به تومان است و تاریخ&zwnj;ها میلادی (YYYY-MM-DD) هستند.
 - روی سیستم خود شما اجرا می&zwnj;شود و به هیچ سرور واسطی داده نمی&zwnj;فرستد.
 - برای پیدا کردن آن در گوگل یا رجیستری MCP، «سرور MCP اتاقک» یا «otaghak mcp» را جستجو کنید.
+- کلیدواژه&zwnj;های مرتبط: اتاقک، رزرو ویلا، رزرو کلبه، اجاره ویلا شمال، اجاره کلبه جنگلی، اقامتگاه بوم&zwnj;گردی، اجاره روزانه ویلا، قیمت اقامتگاه، سرور MCP فارسی، هوش مصنوعی و رزرو اقامتگاه.
+- ابزارها (۱۵ ابزار با پیشوند <code>ot_</code>): جستجوی اقامتگاه، فیلترها، مقصدها، تخفیف&zwnj;ها، جزئیات اتاق، نظرات، میزبان، اتاق&zwnj;های مشابه، تقویم، قیمت دقیق، تعطیلات، تأخیر در تخلیه، راهنمای کمک و راهنمای سفر.
 
 **نصب در Claude Code:**
 
@@ -333,6 +375,7 @@ publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.i
 - [Jabama MCP server](https://github.com/sepehr071/jabama-mcp) for villas, tours and events
 - [Flytoday MCP server](https://github.com/sepehr071/flytoday-mcp) for flights, hotels and villas
 - [MrBilit MCP server](https://github.com/sepehr071/mrbilit-mcp) for flights, trains, buses and hotels
+- [Iran Quake MCP server](https://github.com/sepehr071/iran-quake-mcp) for recent earthquakes in Iran
 - All servers: [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp), the catalog of Iranian MCP servers
 
 If this saves you clicks, a star helps others find it.
