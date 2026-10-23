@@ -35,7 +35,7 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 - **Use when:** finding a stay in Iran and getting the exact total for dates and guests, with reviews and host stats.
 - **Do not use when:** you need to book or pay (the user does that on otaghak.com), or want prices past the open calendar (end of the next Jalali month, at most 20 nights).
 - **Output:** compact JSON. Prices in Toman, dates Gregorian `YYYY-MM-DD` (`check_out` is the departure day), ratings 0-5. Pass the numeric room id between tools.
-- **Machine-readable:** [`server.json`](https://github.com/sepehr071/otaghak-mcp/blob/main/server.json); catalog of all Iranian MCP servers: [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp) ([TOOLS.md](https://github.com/sepehr071/awesome-iran-mcp/blob/main/TOOLS.md), [servers.json](https://github.com/sepehr071/awesome-iran-mcp/blob/main/servers.json), [llms.txt](https://github.com/sepehr071/awesome-iran-mcp/blob/main/llms.txt)).
+- **Machine-readable:** [`server.json`](https://github.com/sepehr071/otaghak-mcp/blob/main/server.json); catalog of all Iranian MCP servers: [iran-mcp](https://github.com/sepehr071/iran-mcp) ([TOOLS.md](https://github.com/sepehr071/iran-mcp/blob/main/TOOLS.md), [servers.json](https://github.com/sepehr071/iran-mcp/blob/main/servers.json), [llms.txt](https://github.com/sepehr071/iran-mcp/blob/main/llms.txt)).
 
 ## Why
 
@@ -376,7 +376,7 @@ publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.i
 - [Flytoday MCP server](https://github.com/sepehr071/flytoday-mcp) for flights, hotels and villas
 - [MrBilit MCP server](https://github.com/sepehr071/mrbilit-mcp) for flights, trains, buses and hotels
 - [Iran Quake MCP server](https://github.com/sepehr071/iran-quake-mcp) for recent earthquakes in Iran
-- All servers: [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp), the catalog of Iranian MCP servers
+- All servers: [iran-mcp](https://github.com/sepehr071/iran-mcp), the catalog of Iranian MCP servers
 
 If this saves you clicks, a star helps others find it.
 
@@ -388,9 +388,9 @@ not it. Please keep request rates reasonable.
 
 ## Author
 
-<a href="https://www.linkedin.com/in/sepehr-radmard"><img src="https://raw.githubusercontent.com/sepehr071/awesome-iran-mcp/main/assets/author-banner.png" alt="Sepehr Radmard: open-source MCP servers for the Iranian web. LinkedIn: linkedin.com/in/sepehr-radmard" width="100%"></a>
+<a href="https://www.linkedin.com/in/sepehr-radmard"><img src="https://raw.githubusercontent.com/sepehr071/iran-mcp/main/assets/author-banner.png" alt="Sepehr Radmard: open-source MCP servers for the Iranian web. LinkedIn: linkedin.com/in/sepehr-radmard" width="100%"></a>
 
-Built and maintained by **Sepehr Radmard** (سپهر رادمرد). Connect on [LinkedIn](https://www.linkedin.com/in/sepehr-radmard) or follow [@sepehr071 on GitHub](https://github.com/sepehr071) for more MCP servers for Iranian websites, all listed in [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp). If this saves you time, a star on the repo helps other people find it.
+Built and maintained by **Sepehr Radmard** (سپهر رادمرد). Connect on [LinkedIn](https://www.linkedin.com/in/sepehr-radmard) or follow [@sepehr071 on GitHub](https://github.com/sepehr071) for more MCP servers for Iranian websites, all listed in [iran-mcp](https://github.com/sepehr071/iran-mcp). If this saves you time, a star on the repo helps other people find it.
 
 ## License
 
