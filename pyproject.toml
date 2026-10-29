@@ -35,6 +35,7 @@ Homepage = "https://github.com/sepehr071/otaghak-mcp"
 Source = "https://github.com/sepehr071/otaghak-mcp"
 Changelog = "https://github.com/sepehr071/otaghak-mcp/releases"
 Issues = "https://github.com/sepehr071/otaghak-mcp/issues"
+Website = "https://mcpfarsi.ir/servers/otaghak/"
 
 [project.scripts]
 otaghak-mcp = "otaghak_mcp.server:main"

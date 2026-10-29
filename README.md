@@ -15,6 +15,7 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 [![CI](https://github.com/sepehr071/otaghak-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/sepehr071/otaghak-mcp/actions/workflows/ci.yml)
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.sepehr071%2Fotaghak--mcp-7c3aed)](https://registry.modelcontextprotocol.io/?q=otaghak-mcp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-16a34a)](https://github.com/sepehr071/otaghak-mcp/blob/main/LICENSE)
+[![mcpfarsi](https://mcpfarsi.ir/badge/otaghak.svg)](https://mcpfarsi.ir/servers/otaghak/)
 
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=otaghak&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJvdGFnaGFrLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_otaghak--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=otaghak&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22otaghak-mcp%22%5D%7D)
@@ -377,6 +378,7 @@ publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.i
 - [MrBilit MCP server](https://github.com/sepehr071/mrbilit-mcp) for flights, trains, buses and hotels
 - [Iran Quake MCP server](https://github.com/sepehr071/iran-quake-mcp) for recent earthquakes in Iran
 - All servers: [iran-mcp](https://github.com/sepehr071/iran-mcp), the catalog of Iranian MCP servers
+- Listed on [mcpfarsi.ir](https://mcpfarsi.ir/servers/otaghak/), the Persian MCP marketplace
 
 If this saves you clicks, a star helps others find it.
 
