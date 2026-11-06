@@ -24,17 +24,13 @@ def jalali_str(d: date) -> str:
 @tool("Room calendar")
 async def ot_room_calendar(
     room_id: RoomId,
-    start: Annotated[date | None, Field(description="First day YYYY-MM-DD, e.g. '2026-10-20'. Default: today.")] = None,
-    end: Annotated[
-        date | None, Field(description="Last day (inclusive), e.g. '2026-11-20'. Default: start + 30 days.")
-    ] = None,
+    start: Annotated[date | None, Field(description="First day YYYY-MM-DD (default today).")] = None,
+    end: Annotated[date | None, Field(description="Last day, inclusive (default start + 30 days).")] = None,
 ) -> dict[str, Any]:
     """Get a room's calendar day by day: nightly price after and before discount (Toman), free or booked,
     instant booking, min and max nights when arriving that day, weekend, public holiday, late checkout.
 
-    A night is priced on its arrival day. Absent keys: price_before_discount = no discount, instant /
-    weekend / holiday / late_checkout = no. Use to find free dates, cheap nights or allowed stay lengths.
-    Next: ot_price_quote for a stay.
+    A night is priced on its arrival day. Absent keys = no discount / no. Next: ot_price_quote.
     """
     t = today()
     start, last = start or t, horizon(t)
@@ -82,19 +78,16 @@ async def ot_room_calendar(
 @tool("Exact stay price")
 async def ot_price_quote(
     room_id: RoomId,
-    check_in: Annotated[date, Field(description="Arrival day YYYY-MM-DD, e.g. '2026-10-20'.")],
-    check_out: Annotated[date, Field(description="Departure day, e.g. '2026-10-23' (max 20 nights).")],
-    guests: Annotated[int, Field(ge=1, le=50, description="Guests, e.g. 4.")],
+    check_in: Annotated[date, Field(description="Arrival day YYYY-MM-DD.")],
+    check_out: Annotated[date, Field(description="Departure day YYYY-MM-DD (max 20 nights).")],
+    guests: Annotated[int, Field(ge=1, le=50, description="Guests.")],
     late_checkout_hours: LateHours = None,
 ) -> dict[str, Any]:
     """Get the amount to pay (Toman) for a room, dates and guests: nights_total (the room page's
     payable amount for the base guests), the extra-guest charge, optional late checkout, and the total.
-    `nightly` is the calendar breakdown (each discounted night is rounded to 1,000, so it can add up to
-    a little more than nights_total; price_before_discount is absent when there is no discount).
+    `nightly` is the calendar breakdown (rounded per night, so it can add up to a little more than nights_total).
 
-    Also checks that every night is free, the stay length is allowed and the room takes that many
-    guests (available=false with a reason otherwise). Late checkout that cannot be booked keeps the
-    quote, with late_checkout.available=false. Use before the user books on otaghak.com.
+    Also checks free nights, stay length and capacity (available=false with a reason otherwise).
     """
     nights = stay(check_in, check_out)
     calls = [
@@ -190,14 +183,12 @@ async def ot_price_quote(
 
 @tool("Holidays and weekdays")
 async def ot_holidays(
-    start: Annotated[date, Field(description="First day YYYY-MM-DD, e.g. '2026-10-20'.")],
-    end: Annotated[date, Field(description="Last day (inclusive), e.g. '2026-12-31'; max a year after start.")],
+    start: Annotated[date, Field(description="First day YYYY-MM-DD.")],
+    end: Annotated[date, Field(description="Last day, inclusive (max a year after start).")],
 ) -> dict[str, Any]:
     """List Iranian public holidays (Fridays included) in a date range, with Jalali dates and weekdays.
 
-    Holiday flags are filled only about 7 weeks ahead: later days show no holidays, which means
-    unknown, not working days. Use to plan around long weekends; weekend nights (Wed, Thu) and holidays
-    usually cost more (see ot_room_calendar).
+    Flags are filled only about 7 weeks ahead: later days with no holidays mean unknown, not working days.
     """
     for d, name in ((start, "start"), (end, "end")):
         check_date(d, name)
@@ -226,14 +217,13 @@ async def ot_holidays(
 @tool("Late checkout")
 async def ot_late_checkout(
     room_id: RoomId,
-    check_out: Annotated[date | None, Field(description="Departure day to check, e.g. '2026-10-23'.")] = None,
+    check_out: Annotated[date | None, Field(description="Departure day to check.")] = None,
 ) -> dict[str, Any]:
     """Check whether a room offers late checkout, for how many hours and at what price (Toman, a unit
     not confirmed on the site), and with check_out whether it can be booked on that departure day
     (offered rooms are often closed for it on a given day).
 
-    Use when the user wants to leave later than the check-out time. ot_price_quote adds it to a
-    total with late_checkout_hours.
+    ot_price_quote adds it to a total with late_checkout_hours.
     """
     calls = [late_info(room_id)]
     if check_out:

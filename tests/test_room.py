@@ -55,7 +55,7 @@ async def test_ot_room(client, api):
     assert data["mobile_signal"]["همراه اول"] == "خوب/4G"
     # room-detail host stats are often defaults (60 min, 0%), so only ot_host reports them
     assert data["host"] == {"id": 2999269, "name": "فاطمه قنبری", "host_since": "2023-07-03"}
-    assert data["location"] == {"lat": 36.87662433, "lon": 50.739135624, "approximate": True}
+    assert data["location"] == {"lat": 36.8766, "lon": 50.7391, "approximate": True}
     assert data["photo_count"] == 10
     assert data["photos"] == [
         "https://cdn.otaghak.com/otg-images-new/Large/14a12d6e-2ddf-4dd7-9390-8a910ac3140c.webp",

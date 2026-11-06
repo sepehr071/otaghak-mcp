@@ -18,11 +18,9 @@ PHOTO = "https://cdn.otaghak.com/otg-images-new"
 
 FullText = Annotated[bool, Field(description="Return long texts in full instead of clipped.")]
 Slug = Annotated[str, Field(pattern=r"^[A-Za-z][A-Za-z0-9-]{1,60}$")]
-CheckIn = Annotated[
-    date | None, Field(description="Arrival day YYYY-MM-DD, e.g. '2026-10-20' (not past, in the open calendar).")
-]
-CheckOut = Annotated[date | None, Field(description="Departure day YYYY-MM-DD, e.g. '2026-10-23' (max 20 nights).")]
-Guests = Annotated[int | None, Field(ge=1, le=50, description="Guests, e.g. 4; smaller rooms are left out.")]
+CheckIn = Annotated[date | None, Field(description="Arrival day YYYY-MM-DD (not past).")]
+CheckOut = Annotated[date | None, Field(description="Departure day YYYY-MM-DD (max 20 nights).")]
+Guests = Annotated[int | None, Field(ge=1, le=50, description="Guests; smaller rooms are left out.")]
 Limit = Annotated[int, Field(ge=1, le=50, description="Rooms per page.")]
 Page = Annotated[int, Field(ge=0, le=100, description="Zero-based page.")]
 
@@ -47,15 +45,13 @@ async def ot_find_place(
         Field(
             min_length=1,
             max_length=60,
-            description="City/province name (Persian or slug), e.g. 'رامسر', or a room code, e.g. '2508916'.",
+            description="City/province name (Persian or slug) or room code, e.g. 'رامسر'.",
         ),
     ],
 ) -> dict[str, Any]:
     """Turn a place name into the city / province slugs that ot_search_rooms needs, or a room code into its room.
 
-    Cities come with their listing count (undated). A province `listings` number is not a search count.
-    Room names are not searchable here: use ot_search_rooms with `name`. Next: ot_search_rooms, or
-    ot_room for a room hit.
+    Room names are not searchable here (use ot_search_rooms `name`). Next: ot_search_rooms, or ot_room for a room.
     """
     data = await fetch(f"{CORE}/api/v1/Search/GetSearchResult", {"input": query.strip()})
     places = []
@@ -81,55 +77,48 @@ async def ot_find_place(
 async def ot_search_rooms(
     city: Annotated[
         list[Slug] | None,
-        Field(max_length=5, description="City slugs from ot_find_place, e.g. ['ramsar'] (any of them)."),
+        Field(max_length=5, description="City slugs from ot_find_place, e.g. ['ramsar'] (any)."),
     ] = None,
     province: Annotated[Slug | None, Field(description="Province slug, e.g. 'mazandaran'.")] = None,
     collection: Annotated[
         Slug | None, Field(description="Collection code from ot_destinations, e.g. 'beach', 'villapool'.")
     ] = None,
-    city_tag: Annotated[
-        Slug | None, Field(description="City theme slug with `city`, e.g. 'cottage' (ot_travel_guide).")
-    ] = None,
+    city_tag: Annotated[Slug | None, Field(description="City theme slug from ot_travel_guide, e.g. 'cottage'.")] = None,
     check_in: CheckIn = None,
     check_out: CheckOut = None,
     guests: Guests = None,
-    sort: Annotated[
-        Sort, Field(description="Order; with dates, cheapest re-sorts each page by stay_total.")
-    ] = "recommended",
-    min_price: Annotated[int | None, Field(ge=0, description="Min nightly Toman after discount, e.g. 3000000.")] = None,
-    max_price: Annotated[int | None, Field(ge=0, description="Max nightly Toman after discount, e.g. 8000000.")] = None,
-    bedrooms: Annotated[int | None, Field(ge=1, le=20, description="Minimum bedrooms, e.g. 2.")] = None,
+    sort: Annotated[Sort, Field(description="Order.")] = "recommended",
+    min_price: Annotated[int | None, Field(ge=0, description="Min nightly Toman after discount.")] = None,
+    max_price: Annotated[int | None, Field(ge=0, description="Max nightly Toman after discount.")] = None,
+    bedrooms: Annotated[int | None, Field(ge=1, le=20, description="Minimum bedrooms.")] = None,
     min_rating: Annotated[Literal[3, 4, 5] | None, Field(description="Minimum rating.")] = None,
     instant: Annotated[bool, Field(description="Only instant booking.")] = False,
-    prime: Annotated[bool, Field(description="Only 'prime' rooms.")] = False,
+    prime: Annotated[bool, Field(description="Only prime rooms.")] = False,
     room_types: Annotated[
-        list[int] | None, Field(max_length=12, description="Room type ids from ot_search_filters, e.g. [138] villa.")
+        list[int] | None, Field(max_length=12, description="Room type ids from ot_search_filters.")
     ] = None,
     rent_types: Annotated[
-        list[Literal["whole_place", "semi_private", "shared"]] | None, Field(description="Rent type.")
+        list[Literal["whole_place", "semi_private", "shared"]] | None, Field(description="Rent types.")
     ] = None,
     filters: Annotated[
         list[str] | None,
         Field(
             max_length=10,
-            description="Codes from ot_search_filters exactly as returned, e.g. ['ruleValues=10101|10103|10102'] (pets). All must match.",
+            description="Codes from ot_search_filters as returned, e.g. ['ruleValues=10101|10103|10102']. All must match.",
         ),
     ] = None,
     district_id: Annotated[
-        int | None, Field(ge=1, description="Landmark district id from ot_search_filters, with `city`, e.g. 230.")
+        int | None, Field(ge=1, description="Landmark id from ot_search_filters (with `city`).")
     ] = None,
-    name: Annotated[str | None, Field(min_length=2, max_length=60, description="Room name words, e.g. 'نرگس'.")] = None,
-    include_nearby: Annotated[bool, Field(description="Also rooms around the city.")] = False,
+    name: Annotated[str | None, Field(min_length=2, max_length=60, description="Room name words.")] = None,
+    include_nearby: Annotated[bool, Field(description="Include nearby rooms.")] = False,
     page: Page = 0,
     limit: Limit = 10,
 ) -> dict[str, Any]:
     """Search Otaghak stays (villas, cottages, apartments, eco-lodges) in a city, province or collection.
 
-    With check_in/check_out every room is available on those dates and carries the stay price:
-    price_per_night (average after discount) and stay_total for `guests` (incl. extra-guest charges;
-    estimate, can be a few Toman off). Without dates prices are undated starting prices. Get slugs
-    from ot_find_place, filter codes from ot_search_filters. Next: ot_room for details, ot_price_quote
-    for the exact total, ot_room_calendar for other dates.
+    With dates every room is available and carries stay_total (estimate) for `guests`; without, undated starting
+    prices. Slugs: ot_find_place; filter codes: ot_search_filters. Next: ot_room, ot_price_quote.
     """
     if not (city or province or collection):
         raise ToolError("Give a scope: city, province or collection (slugs from ot_find_place or ot_destinations).")
@@ -194,16 +183,14 @@ async def ot_search_rooms(
 
 @tool("Search filter codes")
 async def ot_search_filters(
-    city: Annotated[Slug | None, Field(description="City slug, e.g. 'ramsar'; also returns its districts.")] = None,
+    city: Annotated[Slug | None, Field(description="City slug; also returns its districts.")] = None,
     province: Annotated[Slug | None, Field(description="Province slug, e.g. 'mazandaran'.")] = None,
     collection: Annotated[Slug | None, Field(description="Collection code, e.g. 'beach'.")] = None,
 ) -> dict[str, Any]:
     """List the search filters of a city, province or collection (or the whole site) with the codes ot_search_rooms takes.
 
-    Returns the nightly price range (Toman), room types (ids for room_types), filter codes for
-    `filters` (pool, jacuzzi, parking, heating, pets, parties, beach / jungle area, ...), and for a
-    city its districts and landmarks (district_id). Use when the user asks for an amenity, a rule,
-    a room type or a place near a landmark.
+    Returns the price range (Toman), room type ids, filter codes (pool, pets, parking, ...) and, for a city,
+    districts and landmarks (district_id). Use for an amenity, rule, room type or landmark.
     """
     params = {"boxCode": collection or "", "cityCodes": city or "", "stateCodes": province or ""}
     calls = [fetch(f"{CORE}/api/v3/RoomSearch/GetSearchFilter", params, ttl=CACHE_SECONDS)]
@@ -254,12 +241,11 @@ async def ot_search_filters(
 
 @tool("Popular destinations and collections")
 async def ot_destinations(
-    collection: Annotated[Slug | None, Field(description="Collection code to list its cities, e.g. 'beach'.")] = None,
+    collection: Annotated[Slug | None, Field(description="Collection code, to list its cities.")] = None,
 ) -> dict[str, Any]:
     """Popular cities and collections (themed landing pages: discounted, jungle villas, villas with pool, ...).
 
-    Use when the user has no destination yet, or to find collection codes for ot_search_rooms
-    `collection`. With `collection`, also lists the cities that collection covers (city slugs).
+    Use when there is no destination yet, or for `collection` codes. With `collection`, also its city slugs.
     """
     calls = [fetch(f"{CORE}/api/v1/Search/GetSearchSuggestion", expect=dict, ttl=CACHE_SECONDS)]
     if collection:
@@ -293,7 +279,7 @@ async def ot_destinations(
 
 @tool("Deals and discounts")
 async def ot_deals(
-    city: Annotated[Slug | None, Field(description="City slug, e.g. 'ramsar'. Default: whole site.")] = None,
+    city: Annotated[Slug | None, Field(description="City slug (default: whole site).")] = None,
     check_in: CheckIn = None,
     check_out: CheckOut = None,
     guests: Guests = None,
@@ -301,10 +287,8 @@ async def ot_deals(
 ) -> dict[str, Any]:
     """Current discounts: the home page's last-second deals and the most discounted stays (biggest percent first).
 
-    last_second rooms are site-wide tonight-style deals shown 14:00-23:50 Iran time with undated
-    prices; they are left out when `city` is given. most_discounted lists rooms of the 'discounted'
-    collection (in `city` if given) that have a discount, sorted by percent; with dates the prices
-    are for that stay. Next: ot_price_quote for the exact total.
+    last_second (site-wide, undated prices, shown 14:00-23:50 Iran time) is left out when `city` is given.
+    Next: ot_price_quote.
     """
     nights = stay(check_in, check_out)
     body: dict[str, Any] = {

@@ -26,7 +26,7 @@ from .search import (
     stay,
 )
 
-RoomId = Annotated[int, Field(ge=1, le=999_999_999, description="Room id (code), e.g. 2512254.")]
+RoomId = Annotated[int, Field(ge=1, le=999_999_999, description="Room id (code).")]
 
 # Rating categories by the API's icon key.
 CATEGORIES = {
@@ -51,13 +51,9 @@ async def ot_room(
     """Get one room: description, capacity, rooms and beds, amenities, house rules, check-in/out times,
     cancellation policy, host, nearby places, approximate location, photos and nightly price.
 
-    With check_in/check_out the price is the average night for those dates, even when they are
-    booked (ot_price_quote or ot_room_calendar tells whether they are free); without, an undated
-    starting price. instant_on_some_nights is the room-level flag: instant booking can differ per night,
-    so for given dates read `instant` in ot_price_quote or ot_room_calendar.
-    Use after ot_search_rooms or ot_find_place. Next: ot_price_quote (exact total),
-    ot_room_calendar (free nights), ot_reviews, ot_host (host response and acceptance rates),
-    ot_similar_rooms.
+    With dates the price is the average night even if booked (ot_price_quote / ot_room_calendar say if free);
+    without, an undated starting price. instant_on_some_nights is room-level; per night see `instant` there.
+    Next: ot_price_quote, ot_room_calendar, ot_reviews, ot_host, ot_similar_rooms.
     """
     nights = stay(check_in, check_out)
     params: dict[str, Any] = {"roomId": room_id}
@@ -184,8 +180,7 @@ async def ot_reviews(
     """Get a room's rating (0-5), star histogram, six category scores, percent of guests who recommend it,
     and written reviews, newest first (with host replies).
 
-    rating is null and reviews empty when the room has no ratings yet (new rooms). Use after ot_room or
-    ot_search_rooms to judge quality; ot_host has reviews across all of a host's rooms.
+    rating is null when not rated yet. ot_host has reviews across all of a host's rooms.
     """
 
     async def points_or_none() -> Any:
@@ -231,9 +226,8 @@ async def ot_similar_rooms(
     """Get 4-5 alternatives to a room (same city and type), as the room page shows them (or, while that list is
     empty upstream, a search of the room's city and type up to 1.5x its price; `note` says so).
 
-    Without dates prices are undated starting prices (not tonight's). With check_in/check_out the
-    rooms are re-priced for that stay; rooms that are booked or too small for `guests` are listed in
-    not_available. Use when the user's room is full or too expensive. Next: ot_room, ot_price_quote.
+    Without dates prices are undated starting prices; with dates they are re-priced, and booked or too small
+    rooms go to not_available. Next: ot_room, ot_price_quote.
     """
     nights = stay(check_in, check_out)
     data = await fetch(f"{CORE}/api/v1/Rooms/GetSimilarRooms", method="POST", json={"roomId": room_id})
@@ -316,8 +310,7 @@ async def ot_host(
     """Check a host: response time, response and acceptance rates, member since, active rooms
     (undated starting prices) and the newest guest reviews across all their rooms.
 
-    Pass host_id, or room_id to find the room's host. Use to judge whether a host is reliable or to
-    see their other places.
+    Pass host_id, or room_id to find the room's host.
     """
     if not host_id:
         if not room_id:

@@ -21,19 +21,17 @@ PAGES = {"terms": "term-of-service", "host_rules": "host-rules", "quality_policy
 async def ot_help(
     topic: Annotated[
         Literal["faq", "terms", "host_rules", "quality_policy"],
-        Field(
-            description="faq, terms (booking, cancellation policies, refunds, wallet, stay rules), host_rules, quality_policy."
-        ),
+        Field(description="terms covers booking, cancellation, refunds, wallet."),
     ] = "faq",
     query: Annotated[
-        str | None, Field(min_length=2, max_length=60, description="Persian words to look for, e.g. 'لغو', 'کیف پول'.")
+        str | None, Field(min_length=2, max_length=60, description="Persian words to look for, e.g. 'لغو'.")
     ] = None,
 ) -> dict[str, Any]:
     """Read Otaghak's help center: the FAQ, or the guest terms (booking and cancellation rules,
     the five cancellation policies, refunds, wallet, check-in rules), host rules or quality policy.
 
-    Without `query` you get every FAQ question (short answers) or the section titles of a page with a
-    preview; with `query` the matching FAQ items or page paragraphs. A room's own cancellation policy is in ot_room.
+    Without `query`: every FAQ question or the page's section titles; with it, the matches. A room's own
+    cancellation policy is in ot_room.
     """
     words = query.split() if query else []
     if topic == "faq":
@@ -66,11 +64,11 @@ async def ot_help(
 
 @tool("Destination travel guide")
 async def ot_travel_guide(
-    place: Annotated[Slug, Field(description="City, province or collection slug, e.g. 'ramsar', 'beach'.")],
+    place: Annotated[Slug, Field(description="City, province or collection slug.")],
     kind: Annotated[Literal["city", "province", "collection"], Field(description="What `place` is.")] = "city",
     blog_query: Annotated[
         str | None,
-        Field(min_length=2, max_length=60, description="Blog search words, e.g. 'رستوران رامسر'. Default: place name."),
+        Field(min_length=2, max_length=60, description="Blog search words (default: place name)."),
     ] = None,
     max_chars: Annotated[int, Field(ge=500, le=12000, description="Max characters of the guide text.")] = 2000,
     full_text: FullText = False,
@@ -79,8 +77,7 @@ async def ot_travel_guide(
     sights, prices), related search pages (city themes such as beach, cottage, apartment with listing
     counts) and matching blog articles (restaurants, sights, souvenirs).
 
-    Use when the user asks what a place is like or what to do there. City theme slugs from
-    related_pages go to ot_search_rooms `city_tag`.
+    City theme slugs from related_pages go to ot_search_rooms `city_tag`.
     """
     route = {"city": "city", "province": "province", "collection": "landing"}[kind]
     faq_type = {"city": "City", "collection": "Tag"}.get(kind)
