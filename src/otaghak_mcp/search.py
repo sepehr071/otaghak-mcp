@@ -87,7 +87,9 @@ async def ot_search_rooms(
     check_in: CheckIn = None,
     check_out: CheckOut = None,
     guests: Guests = None,
-    sort: Annotated[Sort, Field(description="Order.")] = "recommended",
+    sort: Annotated[
+        Sort, Field(description="Order; with dates, cheapest re-sorts each page by stay_total.")
+    ] = "recommended",
     min_price: Annotated[int | None, Field(ge=0, description="Min nightly Toman after discount.")] = None,
     max_price: Annotated[int | None, Field(ge=0, description="Max nightly Toman after discount.")] = None,
     bedrooms: Annotated[int | None, Field(ge=1, le=20, description="Minimum bedrooms.")] = None,
@@ -288,7 +290,7 @@ async def ot_deals(
     """Current discounts: the home page's last-second deals and the most discounted stays (biggest percent first).
 
     last_second (site-wide, undated prices, shown 14:00-23:50 Iran time) is left out when `city` is given.
-    Next: ot_price_quote.
+    most_discounted lists rooms of the discounted collection (in `city` if given). Next: ot_price_quote.
     """
     nights = stay(check_in, check_out)
     body: dict[str, Any] = {

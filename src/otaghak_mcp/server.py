@@ -19,7 +19,7 @@ Workflow: ot_find_place (name -> city slug; room code -> room) or ot_destination
 villapool) -> ot_search_rooms (city / province / collection, check_in, check_out, guests; dated results are
 available rooms; amenity, rule and room type codes and landmarks come from ot_search_filters) -> ot_room,
 ot_reviews, ot_host, ot_similar_rooms -> ot_room_calendar (free nights), ot_price_quote (exact payable amount),
-ot_late_checkout, ot_holidays. Also ot_deals, ot_help (FAQ, terms, cancellation policies), ot_travel_guide.
+ot_late_checkout, ot_holidays. Deals: ot_deals (last-second and most discounted). Also ot_help (FAQ, terms, cancellation policies), ot_travel_guide.
 With dates each search page is re-sorted by stay_total, so compare stay_total across pages.
 
 Conventions: all prices are Toman (the API is Toman; 1 Toman = 10 Rial). price_per_night is after
