@@ -20,7 +20,7 @@ for your dates and guests, and read reviews and host stats, all from Claude, Cur
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=otaghak&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJvdGFnaGFrLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_otaghak--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=otaghak&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22otaghak-mcp%22%5D%7D)
 
-[For AI agents](#for-ai-agents) · [Why](#why) · [What it can do](#what-it-can-do) · [Quick start](#quick-start) · [Tools](#tools) · [How it works](#how-it-works) · [Good to know](#good-to-know) · [FAQ](#faq) · [Configuration](#configuration) · [فارسی](#فارسی) · [Development](#development) · [Related servers](#related-servers) · [Disclaimer](#disclaimer) · [License](#license)
+[For AI agents](#for-ai-agents) · [Why](#why) · [What it can do](#what-it-can-do) · [Quick start](#quick-start) · [Tools](#tools) · [Good to know](#good-to-know) · [FAQ](#faq) · [Configuration](#configuration) · [فارسی](#فارسی) · [Development](#development) · [Related servers](#related-servers) · [Disclaimer](#disclaimer) · [License](#license)
 
 </div>
 
@@ -171,22 +171,6 @@ Then just ask:
 - <span dir="rtl">یک کلبه جنگلی در ماسال برای ۴ نفر، آخر هفته بعد، با رزرو آنی پیدا کن.</span>
 - <span dir="rtl">قیمت نهایی ویلای شماره ۲۵۱۲۲۵۴ برای ۵ نفر از ۲۰ تا ۲۳ اکتبر چقدر می&zwnj;شود؟</span>
 - <span dir="rtl">تخفیف&zwnj;دارترین اقامتگاه&zwnj;های شمال را نشان بده.</span>
-
-## How it works
-
-```text
-  AI agent  (Claude, Cursor, Copilot, ...)
-      │
-      │  MCP over stdio
-      ▼
-  otaghak-mcp  (runs on your machine)
-      │
-      │  HTTPS (REST + OData)
-      └──────▶  core.otaghak.com, www.otaghak.com/blog
-```
-
-`otaghak-mcp` runs locally and calls the same public endpoints the otaghak.com website uses.
-There's no hosted server in between, no API key, and nothing about you is sent anywhere else.
 
 ## Tools
 
